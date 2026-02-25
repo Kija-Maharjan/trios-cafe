@@ -547,8 +547,6 @@
     </div>
     <div class="op-foot">
       <div class="totals">
-        <div class="tot-row"><span>Subtotal</span><span class="v" id="tSub">Rs. 0</span></div>
-        <div class="tot-row"><span>VAT (13%)</span><span class="v" id="tTax">Rs. 0</span></div>
         <div class="tot-row grand"><span>Total</span><span class="v" id="tTotal">Rs. 0</span></div>
       </div>
       <button class="btn-place" onclick="placeOrder()">✓  Place Order</button>
@@ -812,27 +810,20 @@ function renderCart(){
 }
 
 function updateTotals(sub){
-  const tax=Math.round(sub*0.13);
-  document.getElementById('tSub').textContent='Rs. '+sub;
-  document.getElementById('tTax').textContent='Rs. '+tax;
-  document.getElementById('tTotal').textContent='Rs. '+(sub+tax);
+  document.getElementById('tTotal').textContent='Rs. '+sub;
 }
 
 function placeOrder(){
   if(!cart.length){alert('Please add items first!');return;}
   const name=document.getElementById('custName').value.trim()||'Guest';
   const table=document.getElementById('tableNo').value||'—';
-  const sub=cart.reduce((s,c)=>s+c.price*c.qty,0);
-  const tax=Math.round(sub*0.13);
-  const total=sub+tax;
+  const total=cart.reduce((s,c)=>s+c.price*c.qty,0);
   
   // Send to API
   const orderData = {
     customer_name: name,
     table_no: table,
     items: cart,
-    subtotal: sub,
-    tax: tax,
     total: total
   };
 
@@ -848,7 +839,7 @@ function placeOrder(){
     const timeStr = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
     
     // Store locally for display
-    history.unshift({id:oid, name, table, sub, tax, total, time:timeStr, items:[...cart]});
+    history.unshift({id:oid, name, table, total, time:timeStr, items:[...cart]});
     
     document.getElementById('rId').textContent = oid;
     document.getElementById('rTime').innerHTML = now.toLocaleDateString('en-NP')+'<br>'+timeStr;
@@ -865,7 +856,7 @@ function placeOrder(){
     const oid = '#' + String(++orderNum).padStart(4, '0');
     const now = new Date();
     const timeStr = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    history.unshift({id:oid, name, table, sub, tax, total, time:timeStr, items:[...cart]});
+    history.unshift({id:oid, name, table, total, time:timeStr, items:[...cart]});
     
     document.getElementById('rId').textContent = oid;
     document.getElementById('rTime').innerHTML = now.toLocaleDateString('en-NP')+'<br>'+timeStr;
@@ -921,14 +912,6 @@ function openHistory(){
                 </div>`).join('')}
               <div class="detail-totals">
                 <div class="dt-item">
-                  <div class="dt-label">Subtotal</div>
-                  <div class="dt-val">Rs. ${o.sub}</div>
-                </div>
-                <div class="dt-item">
-                  <div class="dt-label">VAT 13%</div>
-                  <div class="dt-val">Rs. ${o.tax}</div>
-                </div>
-                <div class="dt-item">
                   <div class="dt-label">Total Paid</div>
                   <div class="dt-val grand">Rs. ${o.total}</div>
                 </div>
@@ -975,14 +958,6 @@ function openHistory(){
                   <div class="dp">Rs. ${c.price*c.qty}</div>
                 </div>`).join('')}
               <div class="detail-totals">
-                <div class="dt-item">
-                  <div class="dt-label">Subtotal</div>
-                  <div class="dt-val">Rs. ${o.sub}</div>
-                </div>
-                <div class="dt-item">
-                  <div class="dt-label">VAT 13%</div>
-                  <div class="dt-val">Rs. ${o.tax}</div>
-                </div>
                 <div class="dt-item">
                   <div class="dt-label">Total Paid</div>
                   <div class="dt-val grand">Rs. ${o.total}</div>

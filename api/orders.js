@@ -33,7 +33,7 @@ export default async function handler(req, res) {
 
     if (req.method === 'POST') {
       // Create new order
-      const { customer_name, table_no, items, subtotal, tax, total } = req.body;
+      const { customer_name, table_no, items, total } = req.body;
 
       if (!customer_name || !table_no || !items || !total) {
         return res.status(400).json({ error: 'Missing required fields' });
@@ -46,8 +46,6 @@ export default async function handler(req, res) {
             customer_name,
             table_no,
             items,
-            subtotal,
-            tax,
             total,
             created_at: new Date().toISOString(),
           },
