@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trio's Cafe — POS</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sage:       #7A9E87;
+    --sage-dark:  #4E7261;
+    --sage-light: #B8D0BE;
+    --sage-pale:  #E8F2EB;
+    --cream:      #F7F2E8;
+    --parchment:  #EDE6D4;
+    --wheat:      #C4A882;
+    --bark:       #6B4F35;
+    --ink:        #2C3E2D;
+    --muted:      #7A8C78;
+    --white:      #FDFAF4;
+    --red:        #B05040;
+    --gold:       #C49A4A;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--cream);
+    font-family: 'Jost', sans-serif;
+    color: var(--ink);
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--white);
+    border-bottom: 2px solid var(--sage-light);
+    padding: 0 1.8rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 12px rgba(78,114,97,0.07);
+    position: relative; z-index:50;
+  }
+
+  .logo { display:flex; align-items:center; gap:12px; }
+
+  .logo-mark {
+    width:38px; height:38px;
+    background: var(--sage);
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.1rem; color:var(--white);
+    box-shadow: 0 2px 8px rgba(122,158,135,0.35);
+  }
+
+  .logo-text {
+    font-family:'Cormorant Garamond',serif;
+    font-size:1.45rem; color:var(--ink); line-height:1;
+  }
+  .logo-text small {
+    font-family:'Jost',sans-serif;
+    font-size:0.6rem; font-weight:400; color:var(--muted);
+    letter-spacing:0.18em; text-transform:uppercase;
+    display:block; margin-top:2px;
+  }
+
+  .header-right { display:flex; align-items:center; gap:0.9rem; }
+  .clk { font-size:0.78rem; color:var(--muted); }
+
+  .nav-btn {
+    background:var(--sage-pale);
+    border:1px solid var(--sage-light);
+    color:var(--sage-dark);
+    border-radius:8px;
+    padding:6px 14px;
+    font-family:'Jost',sans-serif;
+    font-size:0.78rem; font-weight:500;
+    cursor:pointer; transition:all 0.2s;
+  }
+  .nav-btn:hover { background:var(--sage-light); color:var(--ink); }
+
+  .staff-pill {
+    background:var(--sage); color:var(--white);
+    font-size:0.7rem; font-weight:600;
+    padding:4px 14px; border-radius:20px;
+    letter-spacing:0.08em; text-transform:uppercase;
+  }
+
+  /* ── LAYOUT ── */
+  .app {
+    display:grid;
+    grid-template-columns:195px 1fr 340px;
+    height:calc(100vh - 60px);
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    background:var(--white);
+    border-right:1px solid var(--parchment);
+    overflow-y:auto; padding:1.4rem 0;
+  }
+  .sidebar-label {
+    font-size:0.6rem; letter-spacing:0.18em; text-transform:uppercase;
+    color:var(--wheat); padding:0 1.2rem 0.9rem; font-weight:600;
+  }
+  .cat-btn {
+    display:flex; align-items:center; gap:10px;
+    width:100%; padding:0.7rem 1.2rem;
+    background:none; border:none;
+    border-left:3px solid transparent;
+    color:var(--muted); font-family:'Jost',sans-serif;
+    font-size:0.84rem; font-weight:400;
+    cursor:pointer; text-align:left; transition:all 0.18s;
+  }
+  .cat-btn:hover { background:var(--sage-pale); color:var(--sage-dark); }
+  .cat-btn.active {
+    background:var(--sage-pale);
+    border-left-color:var(--sage);
+    color:var(--sage-dark); font-weight:600;
+  }
+  .cat-btn .icon { font-size:1rem; width:20px; text-align:center; }
+  .cat-btn .cnt {
+    margin-left:auto;
+    background:var(--parchment); color:var(--muted);
+    font-size:0.67rem; padding:2px 7px; border-radius:10px;
+  }
+  .cat-btn.active .cnt { background:var(--sage-light); color:var(--sage-dark); }
+
+  /* ── MENU AREA ── */
+  .menu-area { overflow-y:auto; padding:1.3rem; background:var(--cream); }
+
+  .menu-top {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:1.1rem; gap:0.8rem;
+  }
+  .menu-heading {
+    font-family:'Cormorant Garamond',serif;
+    font-size:1.4rem; font-weight:600; color:var(--ink);
+  }
+  .search-box {
+    background:var(--white);
+    border:1px solid var(--parchment);
+    border-radius:8px; padding:0.45rem 0.9rem;
+    color:var(--ink); font-family:'Jost',sans-serif;
+    font-size:0.8rem; outline:none; width:185px;
+    transition:border-color 0.2s;
+  }
+  .search-box:focus { border-color:var(--sage); }
+  .search-box::placeholder { color:var(--muted); opacity:0.5; }
+
+  .items-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(148px,1fr));
+    gap:0.85rem;
+  }
+
+  .item-card {
+    background:var(--white);
+    border:1.5px solid var(--parchment);
+    border-radius:14px; padding:1rem;
+    cursor:pointer; transition:all 0.2s;
+    position:relative; overflow:hidden;
+  }
+  .item-card:hover {
+    border-color:var(--sage-light);
+    transform:translateY(-2px);
+    box-shadow:0 6px 18px rgba(122,158,135,0.14);
+  }
+  .item-card.in-cart { border-color:var(--sage); background:var(--sage-pale); }
+
+  .item-emoji { font-size:1.65rem; display:block; margin-bottom:0.45rem; }
+  .item-name { font-size:0.8rem; font-weight:600; color:var(--ink); margin-bottom:0.2rem; line-height:1.3; }
+  .item-note { font-size:0.67rem; color:var(--muted); margin-bottom:0.3rem; }
+  .item-price { font-size:0.88rem; font-weight:600; color:var(--sage-dark); }
+  .item-price .u { font-size:0.67rem; font-weight:400; color:var(--muted); }
+
+  .plus-btn {
+    position:absolute; bottom:9px; right:9px;
+    background:var(--sage); color:var(--white);
+    border:none; width:24px; height:24px; border-radius:50%;
+    font-size:1rem; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; transition:opacity 0.2s, transform 0.15s;
+    box-shadow:0 2px 8px rgba(122,158,135,0.35);
+  }
+  .item-card:hover .plus-btn { opacity:1; }
+  .plus-btn:hover { transform:scale(1.15); }
+
+  /* ── ORDER PANEL ── */
+  .order-panel {
+    background:var(--white);
+    border-left:1px solid var(--parchment);
+    display:flex; flex-direction:column;
+  }
+
+  .op-head {
+    padding:0.9rem 1.3rem;
+    border-bottom:1px solid var(--parchment);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .op-title { font-family:'Cormorant Garamond',serif; font-size:1.1rem; color:var(--ink); }
+  .cart-pill {
+    background:var(--sage); color:var(--white);
+    font-size:0.7rem; font-weight:600;
+    padding:3px 11px; border-radius:20px;
+  }
+
+  .cust-row {
+    padding:0.8rem 1.3rem;
+    border-bottom:1px solid var(--parchment);
+    display:grid; grid-template-columns:1fr 72px; gap:0.6rem;
+  }
+  .f label {
+    font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--wheat); display:block; margin-bottom:3px; font-weight:600;
+  }
+  .f input {
+    background:var(--cream);
+    border:1.5px solid var(--parchment); border-radius:8px;
+    padding:0.42rem 0.7rem; color:var(--ink);
+    font-family:'Jost',sans-serif; font-size:0.82rem;
+    width:100%; outline:none; transition:border-color 0.2s;
+  }
+  .f input:focus { border-color:var(--sage); }
+
+  .cart-list { flex:1; overflow-y:auto; padding:0.8rem 1.3rem; }
+
+  .empty-cart {
+    height:100%; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    color:var(--muted); opacity:0.4; gap:0.4rem; font-size:0.82rem;
+  }
+  .empty-cart .big { font-size:2rem; }
+
+  .cart-row {
+    display:flex; align-items:center; gap:0.6rem;
+    padding:0.58rem 0;
+    border-bottom:1px solid var(--parchment);
+  }
+  .cr-info { flex:1; min-width:0; }
+  .cr-name { font-size:0.8rem; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:500; }
+  .cr-unit { font-size:0.67rem; color:var(--muted); }
+
+  .qty-box {
+    display:flex; align-items:center; gap:4px;
+    background:var(--cream); border:1px solid var(--parchment);
+    border-radius:7px; padding:3px 6px;
+  }
+  .qb { background:none; border:none; color:var(--sage-dark); cursor:pointer; font-size:0.95rem; line-height:1; padding:0 1px; }
+  .qn { font-size:0.78rem; font-weight:700; min-width:14px; text-align:center; color:var(--ink); }
+
+  .cr-price { font-size:0.8rem; font-weight:600; color:var(--sage-dark); min-width:52px; text-align:right; }
+  .cr-del { background:none; border:none; color:rgba(176,80,64,0.35); cursor:pointer; font-size:0.8rem; padding:2px; transition:color 0.15s; }
+  .cr-del:hover { color:var(--red); }
+
+  .op-foot {
+    padding:1rem 1.3rem;
+    border-top:1px solid var(--parchment);
+  }
+  .totals { margin-bottom:0.9rem; }
+  .tot-row {
+    display:flex; justify-content:space-between;
+    font-size:0.78rem; color:var(--muted); margin-bottom:0.28rem;
+  }
+  .tot-row.grand {
+    font-size:1rem; font-weight:700; color:var(--ink);
+    border-top:1.5px solid var(--parchment);
+    padding-top:0.5rem; margin-top:0.3rem;
+  }
+  .tot-row.grand .v { color:var(--sage-dark); }
+
+  .btn-place {
+    width:100%; background:var(--sage); color:var(--white);
+    border:none; border-radius:10px; padding:0.8rem;
+    font-family:'Jost',sans-serif; font-size:0.92rem; font-weight:600;
+    cursor:pointer; letter-spacing:0.04em; transition:all 0.2s;
+    box-shadow:0 4px 14px rgba(122,158,135,0.28);
+    margin-bottom:0.5rem;
+  }
+  .btn-place:hover { background:var(--sage-dark); transform:translateY(-1px); box-shadow:0 6px 18px rgba(78,114,97,0.32); }
+
+  .btn-clear {
+    width:100%; background:transparent; color:var(--muted);
+    border:1.5px solid var(--parchment); border-radius:10px; padding:0.55rem;
+    font-family:'Jost',sans-serif; font-size:0.8rem; cursor:pointer; transition:all 0.2s;
+  }
+  .btn-clear:hover { border-color:var(--red); color:var(--red); }
+
+  /* ── OVERLAYS ── */
+  .overlay {
+    position:fixed; inset:0;
+    background:rgba(44,62,45,0.5);
+    display:flex; align-items:center; justify-content:center;
+    z-index:200; backdrop-filter:blur(6px);
+    opacity:0; pointer-events:none; transition:opacity 0.3s;
+  }
+  .overlay.show { opacity:1; pointer-events:all; }
+
+  /* CONFIRM MODAL */
+  .modal {
+    background:var(--white);
+    border:1.5px solid var(--sage-light);
+    border-radius:20px; padding:2rem; width:380px;
+    text-align:center;
+    box-shadow:0 20px 60px rgba(44,62,45,0.18);
+    transform:scale(0.96) translateY(10px);
+    transition:transform 0.3s;
+  }
+  .overlay.show .modal { transform:scale(1) translateY(0); }
+
+  .modal-icon { font-size:2.6rem; display:block; margin-bottom:0.7rem; }
+  .modal-title { font-family:'Cormorant Garamond',serif; font-size:1.5rem; color:var(--ink); margin-bottom:0.3rem; }
+  .modal-sub { font-size:0.78rem; color:var(--muted); margin-bottom:1.2rem; }
+
+  .receipt {
+    background:var(--cream); border:1px solid var(--parchment);
+    border-radius:12px; padding:1rem 1.1rem; margin-bottom:1.1rem; text-align:left;
+  }
+  .receipt-top {
+    display:flex; justify-content:space-between; align-items:flex-start;
+    padding-bottom:0.65rem; margin-bottom:0.65rem;
+    border-bottom:1px dashed var(--wheat);
+  }
+  .r-oid-label { font-size:0.58rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--muted); }
+  .r-oid { font-family:'Cormorant Garamond',serif; font-size:1.3rem; color:var(--ink); }
+  .r-time { font-size:0.68rem; color:var(--muted); text-align:right; line-height:1.5; }
+
+  .r-row { display:flex; font-size:0.76rem; margin-bottom:0.22rem; align-items:baseline; }
+  .r-row .rn { flex:1; color:var(--ink); }
+  .r-row .rq { color:var(--muted); width:28px; text-align:center; }
+  .r-row .rp { color:var(--sage-dark); font-weight:600; min-width:60px; text-align:right; }
+
+  .r-total {
+    display:flex; justify-content:space-between;
+    font-size:0.88rem; font-weight:700;
+    margin-top:0.65rem; padding-top:0.5rem;
+    border-top:1px solid var(--parchment); color:var(--ink);
+  }
+  .r-total .amt { color:var(--sage-dark); }
+
+  .modal-info { font-size:0.75rem; color:var(--muted); margin-bottom:1.2rem; }
+  .modal-info span { color:var(--ink); font-weight:600; }
+
+  .btn-new {
+    width:100%; background:var(--sage); color:var(--white);
+    border:none; border-radius:10px; padding:0.8rem;
+    font-family:'Jost',sans-serif; font-size:0.9rem; font-weight:600;
+    cursor:pointer; transition:background 0.2s;
+  }
+  .btn-new:hover { background:var(--sage-dark); }
+
+  /* ── HISTORY PANEL ── */
+  .hist-wrap {
+    background:var(--white);
+    border:1.5px solid var(--sage-light);
+    border-radius:20px; width:700px; max-height:88vh;
+    display:flex; flex-direction:column;
+    box-shadow:0 20px 60px rgba(44,62,45,0.16);
+    transform:scale(0.96) translateY(10px);
+    transition:transform 0.3s; overflow:hidden;
+  }
+  .overlay.show .hist-wrap { transform:scale(1) translateY(0); }
+
+  .hist-head {
+    padding:1.1rem 1.8rem;
+    border-bottom:1px solid var(--parchment);
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--cream); flex-shrink:0;
+  }
+  .hist-title { font-family:'Cormorant Garamond',serif; font-size:1.3rem; color:var(--ink); }
+
+  .hist-stats { display:flex; gap:1.8rem; }
+  .hist-stat .sv { font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-weight:600; color:var(--sage-dark); }
+  .hist-stat .sl { font-size:0.6rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); }
+
+  .btn-close {
+    background:none; border:1.5px solid var(--parchment);
+    color:var(--muted); border-radius:8px;
+    padding:5px 13px; font-size:0.78rem;
+    font-family:'Jost',sans-serif; cursor:pointer; transition:all 0.2s;
+  }
+  .btn-close:hover { border-color:var(--red); color:var(--red); }
+
+  .hist-col-heads {
+    display:grid;
+    grid-template-columns:72px 1fr 50px 55px 95px 22px;
+    gap:0.5rem;
+    padding:0.5rem 1.8rem;
+    background:var(--parchment);
+    font-size:0.6rem; text-transform:uppercase;
+    letter-spacing:0.12em; color:var(--muted); font-weight:600;
+    flex-shrink:0;
+  }
+
+  .hist-body { overflow-y:auto; flex:1; }
+
+  /* Order blocks */
+  .order-block { border-bottom:1px solid var(--parchment); }
+  .order-block:last-child { border-bottom:none; }
+
+  .order-block-head {
+    display:grid;
+    grid-template-columns:72px 1fr 50px 55px 95px 22px;
+    gap:0.5rem;
+    padding:0.85rem 1.8rem;
+    cursor:pointer; align-items:center;
+    transition:background 0.15s;
+  }
+  .order-block-head:hover { background:var(--sage-pale); }
+  .order-block.expanded .order-block-head { background:var(--sage-pale); }
+
+  .ob-id { font-weight:700; color:var(--sage-dark); font-size:0.82rem; }
+  .ob-name { font-size:0.82rem; color:var(--ink); font-weight:500; }
+  .ob-table { font-size:0.78rem; color:var(--muted); text-align:center; }
+  .ob-count { font-size:0.72rem; color:var(--muted); text-align:center; }
+  .ob-total { font-size:0.85rem; font-weight:700; color:var(--sage-dark); text-align:right; }
+  .ob-arrow { font-size:0.65rem; color:var(--muted); transition:transform 0.22s; text-align:center; }
+  .order-block.expanded .ob-arrow { transform:rotate(180deg); }
+
+  /* Expanded detail */
+  .order-items-detail {
+    display:none;
+    background:var(--cream);
+    padding:0.9rem 1.8rem 1.1rem 2.6rem;
+    border-top:1px dashed var(--parchment);
+  }
+  .order-block.expanded .order-items-detail { display:block; }
+
+  .detail-section-title {
+    font-size:0.6rem; text-transform:uppercase; letter-spacing:0.12em;
+    color:var(--muted); margin-bottom:0.55rem; font-weight:600;
+  }
+
+  .detail-row {
+    display:flex; align-items:center;
+    padding:0.3rem 0; font-size:0.78rem;
+    border-bottom:1px solid rgba(212,184,150,0.25); gap:0.5rem;
+  }
+  .detail-row:last-of-type { border-bottom:none; }
+  .detail-row .de { width:20px; font-size:0.85rem; }
+  .detail-row .dn { flex:1; color:var(--ink); }
+  .detail-row .dq { color:var(--muted); width:36px; text-align:center; font-size:0.72rem; }
+  .detail-row .du { color:var(--muted); width:60px; text-align:right; font-size:0.7rem; }
+  .detail-row .dp { color:var(--sage-dark); font-weight:600; width:68px; text-align:right; }
+
+  .detail-totals {
+    display:flex; justify-content:flex-end; gap:2rem;
+    margin-top:0.7rem; padding-top:0.6rem;
+    border-top:1.5px solid var(--parchment);
+  }
+  .dt-item { text-align:right; }
+  .dt-label { font-size:0.62rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); }
+  .dt-val { font-size:0.82rem; font-weight:700; color:var(--sage-dark); }
+  .dt-val.grand { font-size:0.95rem; color:var(--ink); }
+
+  .detail-meta {
+    font-size:0.67rem; color:var(--muted);
+    margin-top:0.5rem;
+    display:flex; gap:1rem;
+  }
+
+  .no-orders { padding:3rem; text-align:center; color:var(--muted); opacity:0.45; font-size:0.84rem; }
+
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-thumb { background:var(--sage-light); border-radius:4px; }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+  .fade { animation:fadeUp 0.26s ease both; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">☕</div>
+    <div class="logo-text">
+      Trio's Cafe
+      <small>Point of Sale · Kathmandu</small>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="nav-btn" onclick="openHistory()">📋 Order History</button>
+    <div class="clk">🕐 <span id="clk"></span></div>
+    <div class="staff-pill">Staff</div>
+  </div>
+</header>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="sidebar-label">Categories</div>
+    <button class="cat-btn active" onclick="switchCat(this,'breakfast')">
+      <span class="icon">🍳</span> Breakfast <span class="cnt">4</span>
+    </button>
+    <button class="cat-btn" onclick="switchCat(this,'food')">
+      <span class="icon">🥟</span> Food Menu <span class="cnt">16</span>
+    </button>
+    <button class="cat-btn" onclick="switchCat(this,'snacks')">
+      <span class="icon">🍟</span> Snacks <span class="cnt">11</span>
+    </button>
+    <button class="cat-btn" onclick="switchCat(this,'appetizer')">
+      <span class="icon">🥗</span> Appetizer <span class="cnt">36</span>
+    </button>
+    <button class="cat-btn" onclick="switchCat(this,'hotdrinks')">
+      <span class="icon">☕</span> Hot Drinks <span class="cnt">15</span>
+    </button>
+    <button class="cat-btn" onclick="switchCat(this,'colddrinks')">
+      <span class="icon">🧊</span> Cold Drinks <span class="cnt">10</span>
+    </button>
+    <button class="cat-btn" onclick="switchCat(this,'alcoholic')">
+      <span class="icon">🍺</span> Alcoholic <span class="cnt">12</span>
+    </button>
+  </aside>
+
+  <main class="menu-area">
+    <div class="menu-top">
+      <div class="menu-heading" id="menuHeading">🍳 Breakfast</div>
+      <input class="search-box" type="text" placeholder="Search menu…" oninput="doSearch(this.value)">
+    </div>
+    <div class="items-grid" id="grid"></div>
+  </main>
+
+  <aside class="order-panel">
+    <div class="op-head">
+      <div class="op-title">Current Order</div>
+      <div class="cart-pill" id="cartPill">0 items</div>
+    </div>
+    <div class="cust-row">
+      <div class="f">
+        <label>Customer Name</label>
+        <input type="text" id="custName" placeholder="e.g. Ram Bahadur">
+      </div>
+      <div class="f">
+        <label>Table #</label>
+        <input type="number" id="tableNo" placeholder="1" min="1">
+      </div>
+    </div>
+    <div class="cart-list" id="cartList">
+      <div class="empty-cart">
+        <div class="big">🛒</div>
+        <div>Cart is empty</div>
+        <div style="font-size:0.7rem;margin-top:2px">Tap any item to add</div>
+      </div>
+    </div>
+    <div class="op-foot">
+      <div class="totals">
+        <div class="tot-row"><span>Subtotal</span><span class="v" id="tSub">Rs. 0</span></div>
+        <div class="tot-row"><span>VAT (13%)</span><span class="v" id="tTax">Rs. 0</span></div>
+        <div class="tot-row grand"><span>Total</span><span class="v" id="tTotal">Rs. 0</span></div>
+      </div>
+      <button class="btn-place" onclick="placeOrder()">✓  Place Order</button>
+      <button class="btn-clear" onclick="clearCart()">Clear Cart</button>
+    </div>
+  </aside>
+</div>
+
+<!-- CONFIRM -->
+<div class="overlay" id="confirmOverlay">
+  <div class="modal">
+    <span class="modal-icon">✅</span>
+    <div class="modal-title">Order Placed!</div>
+    <div class="modal-sub">Successfully sent to the kitchen.</div>
+    <div class="receipt">
+      <div class="receipt-top">
+        <div>
+          <div class="r-oid-label">Order ID</div>
+          <div class="r-oid" id="rId">#0101</div>
+        </div>
+        <div class="r-time" id="rTime"></div>
+      </div>
+      <div id="rItems"></div>
+      <div class="r-total">
+        <span>Total Paid</span>
+        <span class="amt" id="rTotal"></span>
+      </div>
+    </div>
+    <div class="modal-info">Customer: <span id="rName">—</span> &nbsp;·&nbsp; Table: <span id="rTable">—</span></div>
+    <button class="btn-new" onclick="newOrder()">+ New Order</button>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div class="overlay" id="histOverlay">
+  <div class="hist-wrap">
+    <div class="hist-head">
+      <div class="hist-title">📋 Order History</div>
+      <div class="hist-stats">
+        <div class="hist-stat">
+          <div class="sv" id="hOrders">0</div>
+          <div class="sl">Orders Today</div>
+        </div>
+        <div class="hist-stat">
+          <div class="sv" id="hRevenue">Rs. 0</div>
+          <div class="sl">Total Revenue</div>
+        </div>
+      </div>
+      <button class="btn-close" onclick="closeHistory()">✕ Close</button>
+    </div>
+    <div class="hist-col-heads">
+      <div>Order ID</div>
+      <div>Customer</div>
+      <div>Table</div>
+      <div>Items</div>
+      <div style="text-align:right">Total</div>
+      <div></div>
+    </div>
+    <div class="hist-body" id="histBody"></div>
+  </div>
+</div>
+
+<script>
+const MENU = {
+  breakfast:{label:'🍳 Breakfast',items:[
+    {id:1, name:'Boiled Egg (2pc)',    price:60,  emoji:'🥚',note:'with bread'},
+    {id:2, name:'Poached Egg (2pc)',   price:80,  emoji:'🥚',note:'with bread'},
+    {id:3, name:'Scrambled Egg (2pc)', price:80,  emoji:'🍳',note:'with bread'},
+    {id:4, name:'Omelette (2pc)',      price:90,  emoji:'🍳',note:'with bread'},
+  ]},
+  food:{label:'🥟 Food Menu',items:[
+    {id:10,name:'Veg Momo Steam',      price:115, emoji:'🥟',note:'steam'},
+    {id:11,name:'Buff Momo Steam',     price:135, emoji:'🥟',note:'steam'},
+    {id:12,name:'Chicken Momo Steam',  price:160, emoji:'🥟',note:'steam'},
+    {id:13,name:'Veg Momo Fry',        price:130, emoji:'🥟',note:'fry'},
+    {id:14,name:'Buff Momo Fry',       price:160, emoji:'🥟',note:'fry'},
+    {id:15,name:'Chicken Momo Fry',    price:180, emoji:'🥟',note:'fry'},
+    {id:16,name:'Buff Momo Chilly',    price:180, emoji:'🌶️',note:'chilly'},
+    {id:17,name:'Chicken Momo Chilly', price:210, emoji:'🌶️',note:'chilly'},
+    {id:18,name:'Veg Chowmein',        price:110, emoji:'🍜',note:''},
+    {id:19,name:'Buff Chowmein',       price:140, emoji:'🍜',note:''},
+    {id:20,name:'Chicken Chowmein',    price:160, emoji:'🍜',note:''},
+    {id:21,name:'Mix Chowmein',        price:230, emoji:'🍜',note:''},
+    {id:22,name:'Veg Thukpa',          price:130, emoji:'🍲',note:''},
+    {id:23,name:'Buff Thukpa',         price:170, emoji:'🍲',note:''},
+    {id:24,name:'Chicken Thukpa',      price:190, emoji:'🍲',note:''},
+    {id:25,name:'Buff Fried Rice',     price:180, emoji:'🍚',note:''},
+  ]},
+  snacks:{label:'🍟 Snacks',items:[
+    {id:30,name:'Aalu Paalu',          price:80,  emoji:'🥔',note:''},
+    {id:31,name:'Aalu Jeera',          price:110, emoji:'🥔',note:''},
+    {id:32,name:'Foksho Half',         price:120, emoji:'🍖',note:'mutton'},
+    {id:33,name:'Foksho Full',         price:200, emoji:'🍖',note:'mutton'},
+    {id:34,name:'Pangra (Fry/Gravy)',  price:200, emoji:'🍗',note:''},
+    {id:35,name:'Buff Bhutan',         price:140, emoji:'🥩',note:''},
+    {id:36,name:'Drum Stick',          price:40,  emoji:'🍗',note:''},
+    {id:37,name:'Wings',               price:90,  emoji:'🍗',note:''},
+    {id:38,name:'Anda Chiura',         price:110, emoji:'🥚',note:''},
+    {id:39,name:'Buff Sausage',        price:45,  emoji:'🌭',note:''},
+    {id:40,name:'Chicken Sausage',     price:60,  emoji:'🌭',note:''},
+  ]},
+  appetizer:{label:'🥗 Appetizer',items:[
+    {id:50,name:'Chauchau Sadheko',    price:100, emoji:'🍜',note:'plain snacks'},
+    {id:51,name:'Bhatmas Sadheko',     price:130, emoji:'🫘',note:'plain snacks'},
+    {id:52,name:'Badam Sadheko',       price:170, emoji:'🥜',note:'plain snacks'},
+    {id:53,name:'Badam & Bhatmas',     price:200, emoji:'🥜',note:'sadheko'},
+    {id:54,name:'Papad (4 pcs)',       price:100, emoji:'🫓',note:''},
+    {id:55,name:'Buff Sausage',        price:130, emoji:'🌭',note:'per plate'},
+    {id:56,name:'Buff Choila',         price:250, emoji:'🥩',note:'per plate'},
+    {id:57,name:'Buff Sukuti',         price:310, emoji:'🥩',note:'per plate'},
+    {id:58,name:'Buff Chilly',         price:340, emoji:'🌶️',note:'per plate'},
+    {id:59,name:'Chicken Sausage',     price:170, emoji:'🌭',note:'per plate'},
+    {id:60,name:'Chicken Boiled',      price:290, emoji:'🍗',note:'boneless'},
+    {id:61,name:'Chicken Fried',       price:275, emoji:'🍗',note:''},
+    {id:62,name:'Chicken Roasted',     price:315, emoji:'🍗',note:''},
+    {id:63,name:'Chicken Chilly',      price:315, emoji:'🌶️',note:'with bone'},
+    {id:64,name:'Nuggets (10 pcs)',    price:250, emoji:'🍗',note:''},
+    {id:65,name:'Meatball (12 pcs)',   price:250, emoji:'🍡',note:''},
+    {id:66,name:'Chicken Sadheko',     price:295, emoji:'🍗',note:''},
+    {id:67,name:'Pork Fried',          price:295, emoji:'🥩',note:'per plate'},
+    {id:68,name:'Pork Chilli',         price:350, emoji:'🌶️',note:'per plate'},
+    {id:69,name:'Pork Tawa',           price:380, emoji:'🥩',note:'per plate'},
+    {id:70,name:'Wai Wai Plain',       price:60,  emoji:'🍜',note:'boiled'},
+    {id:71,name:'Wai Wai Egg',         price:90,  emoji:'🍜',note:'noodles'},
+    {id:72,name:'Wai Wai Mix',         price:150, emoji:'🍜',note:'noodles'},
+    {id:73,name:'Chowchow Plain',      price:80,  emoji:'🍜',note:'current'},
+    {id:74,name:'Chowchow Egg',        price:120, emoji:'🍜',note:'current'},
+    {id:75,name:'Chowchow Mix',        price:180, emoji:'🍜',note:'current'},
+    {id:76,name:'French Fries Half',   price:150, emoji:'🍟',note:''},
+    {id:77,name:'French Fries Full',   price:250, emoji:'🍟',note:''},
+    {id:78,name:'Peri Peri Fries Half',price:180, emoji:'🍟',note:''},
+    {id:79,name:'Chips Chilly',        price:220, emoji:'🌶️',note:''},
+    {id:80,name:'Mustang Aalu',        price:140, emoji:'🥔',note:''},
+    {id:81,name:'Mix Veg Soup',        price:110, emoji:'🥣',note:''},
+    {id:82,name:'Mushroom Soup',       price:120, emoji:'🍄',note:''},
+    {id:83,name:'Chicken Soup',        price:130, emoji:'🍲',note:''},
+    {id:84,name:'Green Salad',         price:130, emoji:'🥗',note:''},
+    {id:85,name:'Vegetable Boil',      price:150, emoji:'🥦',note:''},
+    {id:86,name:'Pop Corn',            price:60,  emoji:'🍿',note:''},
+    {id:87,name:'Butter Pop Corn',     price:100, emoji:'🍿',note:''},
+  ]},
+  hotdrinks:{label:'☕ Hot Drinks',items:[
+    {id:90, name:'Black Tea',           price:20,  emoji:'🍵',note:''},
+    {id:91, name:'Lemon Tea',           price:30,  emoji:'🍵',note:''},
+    {id:92, name:'Milk Tea',            price:35,  emoji:'🍵',note:''},
+    {id:93, name:'Masala Milk Tea',     price:45,  emoji:'🍵',note:''},
+    {id:94, name:'Black Coffee',        price:60,  emoji:'☕',note:''},
+    {id:95, name:'Strong Black Coffee', price:70,  emoji:'☕',note:''},
+    {id:96, name:'Milk Coffee',         price:90,  emoji:'☕',note:''},
+    {id:97, name:'Hot Lemon',           price:60,  emoji:'🍋',note:''},
+    {id:98, name:'Hot Lemon & Honey',   price:110, emoji:'🍯',note:''},
+    {id:99, name:'Lemon Honey Ginger',  price:130, emoji:'🫚',note:''},
+    {id:100,name:'Apple Tea',           price:45,  emoji:'🍎',note:''},
+    {id:101,name:'Peach Tea',           price:45,  emoji:'🍑',note:''},
+    {id:102,name:'Vanilla Tea',         price:45,  emoji:'🌿',note:''},
+    {id:103,name:'Special Peach Tea',   price:80,  emoji:'🍑',note:''},
+    {id:104,name:'Special Lemon Tea',   price:80,  emoji:'🍋',note:''},
+  ]},
+  colddrinks:{label:'🧊 Cold Drinks',items:[
+    {id:110,name:'Coke / Fanta / Sprite',price:70, emoji:'🥤',note:''},
+    {id:111,name:'Cold Coffee',          price:150,emoji:'☕',note:''},
+    {id:112,name:'Peach Iced Tea',       price:150,emoji:'🍑',note:''},
+    {id:113,name:'Lemon Iced Tea',       price:150,emoji:'🍋',note:''},
+    {id:114,name:'Apple Iced Tea',       price:150,emoji:'🍎',note:''},
+    {id:115,name:'Cranberry Juice',      price:400,emoji:'🍇',note:''},
+    {id:116,name:'Redbull',              price:140,emoji:'⚡',note:''},
+    {id:117,name:'Xtreme',               price:160,emoji:'💥',note:''},
+    {id:118,name:'Badam Juice',          price:120,emoji:'🥛',note:''},
+    {id:119,name:'Mocha Latte',          price:120,emoji:'☕',note:''},
+  ]},
+  alcoholic:{label:'🍺 Alcoholic Drinks',items:[
+    {id:130,name:'Golden Oak (90ml)',    price:190, emoji:'🥃',note:'whisky'},
+    {id:131,name:'Mustang (90ml)',       price:220, emoji:'🥃',note:'whisky'},
+    {id:132,name:'Black Oak (90ml)',     price:260, emoji:'🥃',note:'whisky'},
+    {id:133,name:'Khukuri Rum (90ml)',   price:350, emoji:'🥃',note:'rum'},
+    {id:134,name:'Old Durbar (90ml)',    price:490, emoji:'🥃',note:'regular'},
+    {id:135,name:'8848 Vodka (Full)',    price:1400,emoji:'🍾',note:'vodka'},
+    {id:136,name:'Tuborg (Bottle)',      price:500, emoji:'🍺',note:'beer'},
+    {id:137,name:'Tuborg (Can)',         price:440, emoji:'🍺',note:'beer'},
+    {id:138,name:'Nepal Ice (L)',        price:420, emoji:'🍺',note:'beer'},
+    {id:139,name:'Gorkha Strong (L)',    price:440, emoji:'🍺',note:'beer'},
+    {id:140,name:'Gorkha Strong (S)',    price:230, emoji:'🍺',note:'beer'},
+    {id:141,name:'Manang Wine',          price:1400,emoji:'🍷',note:'wine'},
+  ]}
+};
+
+let currentCat='breakfast', cart=[], history=[], orderNum=100;
+
+setInterval(()=>{document.getElementById('clk').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});},1000);
+document.getElementById('clk').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+
+function renderGrid(items){
+  const g=document.getElementById('grid');
+  if(!items.length){g.innerHTML=`<div style="color:var(--muted);padding:2rem;opacity:0.5;font-size:0.82rem;">No items found</div>`;return;}
+  g.innerHTML=items.map(item=>{
+    const inc=cart.find(c=>c.id===item.id);
+    return `<div class="item-card fade${inc?' in-cart':''}" onclick="addItem(${item.id})">
+      <span class="item-emoji">${item.emoji}</span>
+      <div class="item-name">${item.name}</div>
+      ${item.note?`<div class="item-note">${item.note}</div>`:''}
+      <div class="item-price">Rs. ${item.price}${inc?`<span class="u"> · ×${inc.qty}</span>`:''}</div>
+      <button class="plus-btn">+</button>
+    </div>`;
+  }).join('');
+}
+
+function switchCat(btn,cat){
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentCat=cat;
+  document.getElementById('menuHeading').textContent=MENU[cat].label;
+  document.querySelector('.search-box').value='';
+  renderGrid(MENU[cat].items);
+}
+
+function doSearch(q){
+  if(!q){renderGrid(MENU[currentCat].items);return;}
+  renderGrid(Object.values(MENU).flatMap(c=>c.items).filter(i=>i.name.toLowerCase().includes(q.toLowerCase())));
+}
+
+function addItem(id){
+  const item=Object.values(MENU).flatMap(c=>c.items).find(i=>i.id===id);
+  const ex=cart.find(c=>c.id===id);
+  if(ex)ex.qty++;else cart.push({...item,qty:1});
+  renderCart();renderGrid(MENU[currentCat].items);
+}
+function changeQty(id,d){
+  const idx=cart.findIndex(c=>c.id===id);if(idx<0)return;
+  cart[idx].qty+=d;if(cart[idx].qty<=0)cart.splice(idx,1);
+  renderCart();renderGrid(MENU[currentCat].items);
+}
+function removeItem(id){cart=cart.filter(c=>c.id!==id);renderCart();renderGrid(MENU[currentCat].items);}
+function clearCart(){cart=[];renderCart();renderGrid(MENU[currentCat].items);}
+
+function renderCart(){
+  const sub=cart.reduce((s,c)=>s+c.price*c.qty,0);
+  const count=cart.reduce((s,c)=>s+c.qty,0);
+  document.getElementById('cartPill').textContent=count+' item'+(count!==1?'s':'');
+  if(!cart.length){
+    document.getElementById('cartList').innerHTML=`<div class="empty-cart"><div class="big">🛒</div><div>Cart is empty</div><div style="font-size:0.7rem;margin-top:2px">Tap any item to add</div></div>`;
+    updateTotals(0);return;
+  }
+  document.getElementById('cartList').innerHTML=cart.map(c=>`
+    <div class="cart-row">
+      <div class="cr-info">
+        <div class="cr-name">${c.emoji} ${c.name}</div>
+        <div class="cr-unit">Rs. ${c.price} × ${c.qty}</div>
+      </div>
+      <div class="qty-box">
+        <button class="qb" onclick="changeQty(${c.id},-1)">−</button>
+        <div class="qn">${c.qty}</div>
+        <button class="qb" onclick="changeQty(${c.id},1)">+</button>
+      </div>
+      <div class="cr-price">Rs. ${c.price*c.qty}</div>
+      <button class="cr-del" onclick="removeItem(${c.id})">✕</button>
+    </div>`).join('');
+  updateTotals(sub);
+}
+
+function updateTotals(sub){
+  const tax=Math.round(sub*0.13);
+  document.getElementById('tSub').textContent='Rs. '+sub;
+  document.getElementById('tTax').textContent='Rs. '+tax;
+  document.getElementById('tTotal').textContent='Rs. '+(sub+tax);
+}
+
+function placeOrder(){
+  if(!cart.length){alert('Please add items first!');return;}
+  const name=document.getElementById('custName').value.trim()||'Guest';
+  const table=document.getElementById('tableNo').value||'—';
+  const sub=cart.reduce((s,c)=>s+c.price*c.qty,0);
+  const tax=Math.round(sub*0.13);
+  const total=sub+tax;
+  const oid='#'+String(++orderNum).padStart(4,'0');
+  const now=new Date();
+  const timeStr=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  history.unshift({id:oid,name,table,sub,tax,total,time:timeStr,items:[...cart]});
+  document.getElementById('rId').textContent=oid;
+  document.getElementById('rTime').innerHTML=now.toLocaleDateString('en-NP')+'<br>'+timeStr;
+  document.getElementById('rName').textContent=name;
+  document.getElementById('rTable').textContent=table;
+  document.getElementById('rItems').innerHTML=cart.map(c=>`<div class="r-row"><span class="rn">${c.emoji} ${c.name}</span><span class="rq">×${c.qty}</span><span class="rp">Rs.${c.price*c.qty}</span></div>`).join('');
+  document.getElementById('rTotal').textContent='Rs. '+total;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+function newOrder(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  clearCart();
+  document.getElementById('custName').value='';
+  document.getElementById('tableNo').value='';
+}
+
+function openHistory(){
+  const rev=history.reduce((s,o)=>s+o.total,0);
+  document.getElementById('hOrders').textContent=history.length;
+  document.getElementById('hRevenue').textContent='Rs. '+rev;
+  const body=document.getElementById('histBody');
+  if(!history.length){
+    body.innerHTML=`<div class="no-orders">No orders placed yet today.</div>`;
+  } else {
+    body.innerHTML=history.map((o,i)=>`
+      <div class="order-block" id="ob${i}">
+        <div class="order-block-head" onclick="toggleBlock(${i})">
+          <div class="ob-id">${o.id}</div>
+          <div class="ob-name">${o.name}</div>
+          <div class="ob-table">${o.table}</div>
+          <div class="ob-count">${o.items.reduce((s,c)=>s+c.qty,0)} items</div>
+          <div class="ob-total">Rs. ${o.total}</div>
+          <div class="ob-arrow">▼</div>
+        </div>
+        <div class="order-items-detail">
+          <div class="detail-section-title">Order Items — ${o.time}</div>
+          ${o.items.map(c=>`
+            <div class="detail-row">
+              <div class="de">${c.emoji}</div>
+              <div class="dn">${c.name}</div>
+              <div class="dq">×${c.qty}</div>
+              <div class="du">Rs.${c.price} each</div>
+              <div class="dp">Rs. ${c.price*c.qty}</div>
+            </div>`).join('')}
+          <div class="detail-totals">
+            <div class="dt-item">
+              <div class="dt-label">Subtotal</div>
+              <div class="dt-val">Rs. ${o.sub}</div>
+            </div>
+            <div class="dt-item">
+              <div class="dt-label">VAT 13%</div>
+              <div class="dt-val">Rs. ${o.tax}</div>
+            </div>
+            <div class="dt-item">
+              <div class="dt-label">Total Paid</div>
+              <div class="dt-val grand">Rs. ${o.total}</div>
+            </div>
+          </div>
+          <div class="detail-meta">
+            <span>🕐 ${o.time}</span>
+            <span>🪑 Table ${o.table}</span>
+            <span>👤 ${o.name}</span>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+  document.getElementById('histOverlay').classList.add('show');
+}
+function toggleBlock(i){document.getElementById('ob'+i).classList.toggle('expanded');}
+function closeHistory(){document.getElementById('histOverlay').classList.remove('show');}
+
+renderGrid(MENU.breakfast.items);
+</script>
+</body>
+</html>
