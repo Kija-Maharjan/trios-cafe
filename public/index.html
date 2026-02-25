@@ -637,8 +637,9 @@
 
 <script>
 // API Configuration
-// `process` is not defined in browsers when serving static files — guard it
-const API_BASE = (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'production') ? '' : 'http://localhost:3000';
+// Use a relative path in production (deployed) and localhost during local dev.
+// This avoids relying on `process.env` in the browser which is undefined.
+const API_BASE = (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) ? 'http://localhost:3000' : '';
 
 const MENU = {
   breakfast:{label:'🍳 Breakfast',items:[
