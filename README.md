@@ -164,7 +164,8 @@ Response:
 
 ```
 trios-cafe/
-├── trios_cafe_pos.html    # Main frontend application
+├── public/
+│   └── index.html         # Main frontend application
 ├── api/
 │   ├── orders.js          # Orders API endpoint
 │   └── health.js          # Health check endpoint
