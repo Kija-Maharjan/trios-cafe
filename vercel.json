@@ -7,9 +7,5 @@
       "memory": 1024,
       "maxDuration": 30
     }
-  },
-  "env": [
-    "SUPABASE_URL",
-    "SUPABASE_ANON_KEY"
-  ]
+  }
 }
