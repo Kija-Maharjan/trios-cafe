@@ -30,8 +30,8 @@
     background: var(--cream);
     font-family: 'Jost', sans-serif;
     color: var(--ink);
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
+    overflow: auto;
   }
 
   /* ── HEADER ── */
@@ -471,6 +471,20 @@
 
   @keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   .fade { animation:fadeUp 0.26s ease both; }
+
+  /* Responsive: make menu-area full-width on small screens */
+  @media (max-width: 900px) {
+    .app {
+      grid-template-columns: 1fr;
+      height: auto;
+    }
+    .sidebar, .order-panel {
+      display: none;
+    }
+    .menu-area { padding: 1rem; }
+    .items-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+    header { height: 56px; }
+  }
 </style>
 </head>
 <body>
