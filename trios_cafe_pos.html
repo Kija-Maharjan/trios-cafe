@@ -612,6 +612,9 @@
 </div>
 
 <script>
+// API Configuration
+const API_BASE = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3000';
+
 const MENU = {
   breakfast:{label:'🍳 Breakfast',items:[
     {id:1, name:'Boiled Egg (2pc)',    price:60,  emoji:'🥚',note:'with bread'},
@@ -822,17 +825,56 @@ function placeOrder(){
   const sub=cart.reduce((s,c)=>s+c.price*c.qty,0);
   const tax=Math.round(sub*0.13);
   const total=sub+tax;
-  const oid='#'+String(++orderNum).padStart(4,'0');
-  const now=new Date();
-  const timeStr=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  history.unshift({id:oid,name,table,sub,tax,total,time:timeStr,items:[...cart]});
-  document.getElementById('rId').textContent=oid;
-  document.getElementById('rTime').innerHTML=now.toLocaleDateString('en-NP')+'<br>'+timeStr;
-  document.getElementById('rName').textContent=name;
-  document.getElementById('rTable').textContent=table;
-  document.getElementById('rItems').innerHTML=cart.map(c=>`<div class="r-row"><span class="rn">${c.emoji} ${c.name}</span><span class="rq">×${c.qty}</span><span class="rp">Rs.${c.price*c.qty}</span></div>`).join('');
-  document.getElementById('rTotal').textContent='Rs. '+total;
-  document.getElementById('confirmOverlay').classList.add('show');
+  
+  // Send to API
+  const orderData = {
+    customer_name: name,
+    table_no: table,
+    items: cart,
+    subtotal: sub,
+    tax: tax,
+    total: total
+  };
+
+  fetch(`${API_BASE}/api/orders`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(orderData)
+  })
+  .then(res => res.json())
+  .then(data => {
+    const oid = data.id ? '#' + String(data.id).padStart(4, '0') : '#' + String(++orderNum).padStart(4, '0');
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    
+    // Store locally for display
+    history.unshift({id:oid, name, table, sub, tax, total, time:timeStr, items:[...cart]});
+    
+    document.getElementById('rId').textContent = oid;
+    document.getElementById('rTime').innerHTML = now.toLocaleDateString('en-NP')+'<br>'+timeStr;
+    document.getElementById('rName').textContent = name;
+    document.getElementById('rTable').textContent = table;
+    document.getElementById('rItems').innerHTML = cart.map(c=>`<div class="r-row"><span class="rn">${c.emoji} ${c.name}</span><span class="rq">×${c.qty}</span><span class="rp">Rs.${c.price*c.qty}</span></div>`).join('');
+    document.getElementById('rTotal').textContent = 'Rs. ' + total;
+    document.getElementById('confirmOverlay').classList.add('show');
+  })
+  .catch(err => {
+    console.error('Error placing order:', err);
+    alert('Error placing order. Creating local copy...');
+    // Fallback to local storage
+    const oid = '#' + String(++orderNum).padStart(4, '0');
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    history.unshift({id:oid, name, table, sub, tax, total, time:timeStr, items:[...cart]});
+    
+    document.getElementById('rId').textContent = oid;
+    document.getElementById('rTime').innerHTML = now.toLocaleDateString('en-NP')+'<br>'+timeStr;
+    document.getElementById('rName').textContent = name;
+    document.getElementById('rTable').textContent = table;
+    document.getElementById('rItems').innerHTML = cart.map(c=>`<div class="r-row"><span class="rn">${c.emoji} ${c.name}</span><span class="rq">×${c.qty}</span><span class="rp">Rs.${c.price*c.qty}</span></div>`).join('');
+    document.getElementById('rTotal').textContent = 'Rs. ' + total;
+    document.getElementById('confirmOverlay').classList.add('show');
+  });
 }
 function newOrder(){
   document.getElementById('confirmOverlay').classList.remove('show');
@@ -842,56 +884,120 @@ function newOrder(){
 }
 
 function openHistory(){
-  const rev=history.reduce((s,o)=>s+o.total,0);
-  document.getElementById('hOrders').textContent=history.length;
-  document.getElementById('hRevenue').textContent='Rs. '+rev;
-  const body=document.getElementById('histBody');
-  if(!history.length){
-    body.innerHTML=`<div class="no-orders">No orders placed yet today.</div>`;
-  } else {
-    body.innerHTML=history.map((o,i)=>`
-      <div class="order-block" id="ob${i}">
-        <div class="order-block-head" onclick="toggleBlock(${i})">
-          <div class="ob-id">${o.id}</div>
-          <div class="ob-name">${o.name}</div>
-          <div class="ob-table">${o.table}</div>
-          <div class="ob-count">${o.items.reduce((s,c)=>s+c.qty,0)} items</div>
-          <div class="ob-total">Rs. ${o.total}</div>
-          <div class="ob-arrow">▼</div>
-        </div>
-        <div class="order-items-detail">
-          <div class="detail-section-title">Order Items — ${o.time}</div>
-          ${o.items.map(c=>`
-            <div class="detail-row">
-              <div class="de">${c.emoji}</div>
-              <div class="dn">${c.name}</div>
-              <div class="dq">×${c.qty}</div>
-              <div class="du">Rs.${c.price} each</div>
-              <div class="dp">Rs. ${c.price*c.qty}</div>
-            </div>`).join('')}
-          <div class="detail-totals">
-            <div class="dt-item">
-              <div class="dt-label">Subtotal</div>
-              <div class="dt-val">Rs. ${o.sub}</div>
+  // Try to fetch from API
+  fetch(`${API_BASE}/api/orders`)
+    .then(res => res.json())
+    .then(dbOrders => {
+      // Merge with local history
+      const allOrders = [...history];
+      
+      const rev = allOrders.reduce((s,o)=>s+o.total,0);
+      document.getElementById('hOrders').textContent = allOrders.length;
+      document.getElementById('hRevenue').textContent = 'Rs. ' + rev;
+      const body = document.getElementById('histBody');
+      
+      if(!allOrders.length){
+        body.innerHTML=`<div class="no-orders">No orders placed yet today.</div>`;
+      } else {
+        body.innerHTML=allOrders.map((o,i)=>`
+          <div class="order-block" id="ob${i}">
+            <div class="order-block-head" onclick="toggleBlock(${i})">
+              <div class="ob-id">${o.id}</div>
+              <div class="ob-name">${o.name}</div>
+              <div class="ob-table">${o.table}</div>
+              <div class="ob-count">${o.items.reduce((s,c)=>s+c.qty,0)} items</div>
+              <div class="ob-total">Rs. ${o.total}</div>
+              <div class="ob-arrow">▼</div>
             </div>
-            <div class="dt-item">
-              <div class="dt-label">VAT 13%</div>
-              <div class="dt-val">Rs. ${o.tax}</div>
+            <div class="order-items-detail">
+              <div class="detail-section-title">Order Items — ${o.time}</div>
+              ${o.items.map(c=>`
+                <div class="detail-row">
+                  <div class="de">${c.emoji}</div>
+                  <div class="dn">${c.name}</div>
+                  <div class="dq">×${c.qty}</div>
+                  <div class="du">Rs.${c.price} each</div>
+                  <div class="dp">Rs. ${c.price*c.qty}</div>
+                </div>`).join('')}
+              <div class="detail-totals">
+                <div class="dt-item">
+                  <div class="dt-label">Subtotal</div>
+                  <div class="dt-val">Rs. ${o.sub}</div>
+                </div>
+                <div class="dt-item">
+                  <div class="dt-label">VAT 13%</div>
+                  <div class="dt-val">Rs. ${o.tax}</div>
+                </div>
+                <div class="dt-item">
+                  <div class="dt-label">Total Paid</div>
+                  <div class="dt-val grand">Rs. ${o.total}</div>
+                </div>
+              </div>
+              <div class="detail-meta">
+                <span>🕐 ${o.time}</span>
+                <span>🪑 Table ${o.table}</span>
+                <span>👤 ${o.name}</span>
+              </div>
             </div>
-            <div class="dt-item">
-              <div class="dt-label">Total Paid</div>
-              <div class="dt-val grand">Rs. ${o.total}</div>
+          </div>`).join('');
+      }
+      document.getElementById('histOverlay').classList.add('show');
+    })
+    .catch(err => {
+      console.error('Error fetching history:', err);
+      // Use local history as fallback
+      const rev = history.reduce((s,o)=>s+o.total,0);
+      document.getElementById('hOrders').textContent = history.length;
+      document.getElementById('hRevenue').textContent = 'Rs. ' + rev;
+      const body = document.getElementById('histBody');
+      
+      if(!history.length){
+        body.innerHTML=`<div class="no-orders">No orders placed yet today.</div>`;
+      } else {
+        body.innerHTML=history.map((o,i)=>`
+          <div class="order-block" id="ob${i}">
+            <div class="order-block-head" onclick="toggleBlock(${i})">
+              <div class="ob-id">${o.id}</div>
+              <div class="ob-name">${o.name}</div>
+              <div class="ob-table">${o.table}</div>
+              <div class="ob-count">${o.items.reduce((s,c)=>s+c.qty,0)} items</div>
+              <div class="ob-total">Rs. ${o.total}</div>
+              <div class="ob-arrow">▼</div>
             </div>
-          </div>
-          <div class="detail-meta">
-            <span>🕐 ${o.time}</span>
-            <span>🪑 Table ${o.table}</span>
-            <span>👤 ${o.name}</span>
-          </div>
-        </div>
-      </div>`).join('');
-  }
-  document.getElementById('histOverlay').classList.add('show');
+            <div class="order-items-detail">
+              <div class="detail-section-title">Order Items — ${o.time}</div>
+              ${o.items.map(c=>`
+                <div class="detail-row">
+                  <div class="de">${c.emoji}</div>
+                  <div class="dn">${c.name}</div>
+                  <div class="dq">×${c.qty}</div>
+                  <div class="du">Rs.${c.price} each</div>
+                  <div class="dp">Rs. ${c.price*c.qty}</div>
+                </div>`).join('')}
+              <div class="detail-totals">
+                <div class="dt-item">
+                  <div class="dt-label">Subtotal</div>
+                  <div class="dt-val">Rs. ${o.sub}</div>
+                </div>
+                <div class="dt-item">
+                  <div class="dt-label">VAT 13%</div>
+                  <div class="dt-val">Rs. ${o.tax}</div>
+                </div>
+                <div class="dt-item">
+                  <div class="dt-label">Total Paid</div>
+                  <div class="dt-val grand">Rs. ${o.total}</div>
+                </div>
+              </div>
+              <div class="detail-meta">
+                <span>🕐 ${o.time}</span>
+                <span>🪑 Table ${o.table}</span>
+                <span>👤 ${o.name}</span>
+              </div>
+            </div>
+          </div>`).join('');
+      }
+      document.getElementById('histOverlay').classList.add('show');
+    });
 }
 function toggleBlock(i){document.getElementById('ob'+i).classList.toggle('expanded');}
 function closeHistory(){document.getElementById('histOverlay').classList.remove('show');}
