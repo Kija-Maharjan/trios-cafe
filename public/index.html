@@ -637,7 +637,8 @@
 
 <script>
 // API Configuration
-const API_BASE = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3000';
+// `process` is not defined in browsers when serving static files — guard it
+const API_BASE = (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'production') ? '' : 'http://localhost:3000';
 
 const MENU = {
   breakfast:{label:'🍳 Breakfast',items:[
