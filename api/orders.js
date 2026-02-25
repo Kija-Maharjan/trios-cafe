@@ -5,6 +5,12 @@ const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(req, res) {
+  // Validate server env necessary for Supabase access
+  if (!supabaseUrl || !supabaseKey) {
+    console.error('Missing Supabase env vars: SUPABASE_URL or SUPABASE_ANON_KEY');
+    res.status(500).json({ error: 'Supabase configuration missing on server. Set SUPABASE_URL and SUPABASE_ANON_KEY.' });
+    return;
+  }
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
