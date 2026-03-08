@@ -211,19 +211,20 @@
   }
 
   .cust-row {
-    padding:0.8rem 1.3rem;
+    padding:0.4rem 1rem;
     border-bottom:1px solid var(--parchment);
-    display:grid; grid-template-columns:1fr 72px; gap:0.6rem;
+    display:grid; grid-template-columns:1fr 72px; gap:0.4rem;
+    align-items: end;
   }
   .f label {
-    font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase;
-    color:var(--wheat); display:block; margin-bottom:3px; font-weight:600;
+    font-size:0.55rem; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--wheat); display:block; margin-bottom:2px; font-weight:600;
   }
   .f input {
     background:var(--cream);
     border:1.5px solid var(--parchment); border-radius:8px;
-    padding:0.42rem 0.7rem; color:var(--ink);
-    font-family:'Jost',sans-serif; font-size:0.82rem;
+    padding:0.28rem 0.55rem; color:var(--ink);
+    font-family:'Jost',sans-serif; font-size:0.78rem;
     width:100%; outline:none; transition:border-color 0.2s;
   }
   .f input:focus { border-color:var(--sage); }
@@ -472,6 +473,59 @@
   @keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   .fade { animation:fadeUp 0.26s ease both; }
 
+  /* ── FLOOR MAP ── */
+  .floor-map-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .floor-table {
+    border: 2px solid var(--parchment);
+    border-radius: 16px;
+    padding: 1rem;
+    background: var(--white);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .floor-table:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(78,114,97,0.13); }
+  .floor-table.occupied { border-color: #ffcc80; background: #fffaf2; }
+  .floor-table.long-table { grid-column: 1 / -1; border-radius: 20px; }
+  .ft-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .ft-icon { font-size: 1.5rem; }
+  .ft-name { font-weight: 700; font-size: 0.9rem; color: var(--ink); }
+  .ft-seats { font-size: 0.67rem; color: var(--muted); margin-top: 1px; }
+  .ft-badge {
+    font-size: 0.62rem; font-weight: 700; padding: 3px 10px;
+    border-radius: 10px; letter-spacing: 0.04em;
+  }
+  .ft-badge.avail { background: #e8f5e9; color: #388e3c; }
+  .ft-badge.occ   { background: #fff3e0; color: #e65100; }
+  .ft-preview { font-size: 0.72rem; color: var(--muted); line-height: 1.5; margin-top: 4px; }
+  .ft-total { font-size: 0.82rem; font-weight: 700; color: var(--sage-dark); margin-top: 6px; }
+  .ft-empty { text-align: center; color: var(--muted); opacity: 0.25; font-size: 1.8rem; padding: 8px 0; }
+  @media (max-width: 600px) {
+    .floor-map-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  }
+
+  /* Table detail panel */
+  .td-order-card {
+    background: var(--cream); border-radius: 12px;
+    padding: 0.9rem 1rem; margin-bottom: 10px;
+    border: 1px solid var(--parchment);
+  }
+  .td-order-meta { font-size: 0.7rem; color: var(--muted); margin-bottom: 8px; display: flex; gap: 12px; }
+  .td-item-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 0.8rem; border-bottom: 1px solid rgba(212,184,150,0.2); }
+  .td-item-row:last-child { border-bottom: none; }
+  .td-total { font-weight: 700; color: var(--sage-dark); font-size: 0.9rem; margin-top: 8px; text-align: right; }
+  .td-clear-btn {
+    width: 100%; padding: 10px; border-radius: 10px; border: none;
+    background: var(--sage); color: white; font-family: 'Jost', sans-serif;
+    font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-top: 14px;
+    transition: background 0.2s;
+  }
+  .td-clear-btn:hover { background: var(--sage-dark); }
+
   /* ── TABLES & SALES OVERLAYS ── */
   .full-overlay {
     position: fixed; inset: 0; z-index: 200;
@@ -531,6 +585,78 @@
   }
   .tc-clear:hover { background: var(--sage-dark); }
   .tc-empty { text-align: center; color: var(--muted); opacity: 0.3; font-size: 1.5rem; padding: 10px 0; }
+
+  /* Sales tabs */
+  .sales-tab {
+    padding: 0.75rem 1.4rem; border: none; background: none;
+    font-family: 'Jost', sans-serif; font-size: 0.82rem; font-weight: 500;
+    color: var(--muted); cursor: pointer; border-bottom: 2.5px solid transparent;
+    transition: all 0.18s;
+  }
+  .sales-tab.active { color: var(--sage-dark); border-bottom-color: var(--sage-dark); }
+  .sales-tab:hover { color: var(--ink); }
+
+  .sales-section-title {
+    font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--ink);
+    margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--parchment);
+  }
+
+  /* Category breakdown */
+  .cat-breakdown-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 10px;
+  }
+  .cat-card {
+    background: var(--cream); border: 1.5px solid var(--parchment); border-radius: 12px;
+    padding: 0.8rem 1rem;
+  }
+  .cat-card-name { font-size: 0.72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .cat-card-val { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 600; color: var(--sage-dark); }
+  .cat-card-sub { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+
+  /* Top items bar */
+  .top-item-row {
+    display: flex; align-items: center; gap: 10px; padding: 7px 0;
+    border-bottom: 1px solid var(--parchment); font-size: 0.82rem;
+  }
+  .top-item-row:last-child { border-bottom: none; }
+  .ti-rank { font-weight: 700; color: var(--muted); width: 20px; text-align: center; font-size: 0.72rem; }
+  .ti-name { flex: 1; color: var(--ink); }
+  .ti-qty { color: var(--muted); font-size: 0.75rem; }
+  .ti-rev { font-weight: 700; color: var(--sage-dark); min-width: 70px; text-align: right; }
+  .ti-bar-wrap { width: 80px; height: 6px; background: var(--parchment); border-radius: 3px; overflow: hidden; }
+  .ti-bar { height: 100%; background: var(--sage); border-radius: 3px; }
+
+  /* Table breakdown */
+  .tbl-breakdown-row {
+    display: flex; align-items: center; gap: 10px; padding: 7px 0;
+    border-bottom: 1px solid var(--parchment); font-size: 0.82rem;
+  }
+  .tbl-breakdown-row:last-child { border-bottom: none; }
+
+  /* Past days */
+  .day-summary-card {
+    border: 1.5px solid var(--parchment); border-radius: 14px;
+    padding: 1rem 1.2rem; margin-bottom: 10px; background: var(--white);
+    cursor: pointer; transition: all 0.18s;
+  }
+  .day-summary-card:hover { border-color: var(--sage-light); background: var(--sage-pale); }
+  .day-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .day-card-date { font-weight: 700; color: var(--ink); font-size: 0.9rem; }
+  .day-card-rev { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--sage-dark); font-weight: 600; }
+  .day-card-meta { font-size: 0.72rem; color: var(--muted); display: flex; gap: 14px; }
+
+  /* Print styles */
+  @media print {
+    body > *:not(#printReport) { display: none !important; }
+    #printReport { display: block !important; font-family: Arial, sans-serif; padding: 20px; color: #000; }
+    .print-section { margin-bottom: 20px; }
+    .print-title { font-size: 22px; font-weight: bold; margin-bottom: 4px; }
+    .print-subtitle { font-size: 13px; color: #666; margin-bottom: 16px; }
+    .print-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 14px; }
+    .print-table th { background: #f0f0f0; padding: 6px 10px; text-align: left; border: 1px solid #ddd; }
+    .print-table td { padding: 5px 10px; border: 1px solid #ddd; }
+    .print-h2 { font-size: 14px; font-weight: bold; margin: 14px 0 6px; border-bottom: 1px solid #ccc; padding-bottom: 3px; }
+  }
 
   /* Sales dashboard */
   .sales-stats {
@@ -845,7 +971,8 @@
         <button class="btn-close" onclick="closeHistory()">✕ Close</button>
       </div>
     </div>
-    <div class="hist-col-heads">
+    <div class="hist-col-heads" style="grid-template-columns:28px 72px 1fr 50px 70px 55px 95px 32px;">
+      <div><input type="checkbox" id="selectAllOrders" onchange="toggleSelectAll(this)" title="Select all" style="cursor:pointer;width:13px;height:13px;accent-color:var(--sage-dark)"></div>
       <div>Order ID</div>
       <div>Customer</div>
       <div>Table</div>
@@ -854,47 +981,90 @@
       <div style="text-align:right">Total</div>
       <div></div>
     </div>
+    <div id="bulkDeleteBar" style="display:none;padding:6px 1.8rem;background:var(--sage-pale);border-bottom:1px solid var(--sage-light);align-items:center;gap:10px;flex-shrink:0;">
+      <span id="bulkCount" style="font-size:0.78rem;color:var(--sage-dark);font-weight:600;"></span>
+      <button onclick="deleteSelectedOrders()" style="background:var(--red);color:white;border:none;border-radius:8px;padding:4px 14px;font-size:0.75rem;font-family:'Jost',sans-serif;cursor:pointer;">🗑️ Delete Selected</button>
+      <button onclick="clearBulkSelection()" style="background:none;border:1.5px solid var(--parchment);border-radius:8px;padding:4px 12px;font-size:0.75rem;font-family:'Jost',sans-serif;cursor:pointer;color:var(--muted);">Cancel</button>
+    </div>
     <div class="hist-body" id="histBody"></div>
   </div>
 </div>
 
 <!-- TABLES OVERLAY -->
 <div class="full-overlay" id="tablesOverlay">
-  <div class="full-panel">
+  <div class="full-panel" style="max-width:960px;">
     <div class="full-panel-head">
-      <div class="full-panel-title">🪑 Table Management</div>
-      <button class="btn-close" onclick="closeTables()">✕ Close</button>
+      <div class="full-panel-title">🗺️ Floor Map</div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="display:flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--muted);">
+          <span style="width:12px;height:12px;border-radius:3px;background:#e8f5e9;border:1.5px solid #a5d6a7;display:inline-block"></span>Available
+        </span>
+        <span style="display:flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--muted);">
+          <span style="width:12px;height:12px;border-radius:3px;background:#fff3e0;border:1.5px solid #ffcc80;display:inline-block"></span>Occupied
+        </span>
+        <button class="btn-close" onclick="closeTables()">✕ Close</button>
+      </div>
     </div>
-    <div class="full-panel-body">
-      <div class="tables-grid" id="tablesGrid"></div>
+    <div class="full-panel-body" style="padding:1.2rem;">
+      <div id="floorMap" class="floor-map-grid"></div>
     </div>
+  </div>
+</div>
+
+<!-- TABLE DETAIL SHEET -->
+<div class="full-overlay" id="tableDetailOverlay" style="z-index:250;">
+  <div class="full-panel" style="max-width:480px;">
+    <div class="full-panel-head">
+      <div class="full-panel-title" id="tableDetailTitle">Table 1</div>
+      <button class="btn-close" onclick="closeTableDetail()">✕ Close</button>
+    </div>
+    <div class="full-panel-body" id="tableDetailBody" style="padding:1.2rem;"></div>
   </div>
 </div>
 
 <!-- SALES OVERLAY -->
 <div class="full-overlay" id="salesOverlay">
-  <div class="full-panel">
+  <div class="full-panel" style="max-width:960px;">
     <div class="full-panel-head">
       <div class="full-panel-title">📊 Sales Dashboard</div>
-      <button class="btn-close" onclick="closeSales()">✕ Close</button>
-    </div>
-    <div class="full-panel-body">
-      <div class="sales-stats" id="salesStats"></div>
-      <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--ink);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--parchment);">📜 Order History</div>
-      <div style="overflow-x:auto;">
-        <table class="sales-table">
-          <thead>
-            <tr>
-              <th>Order ID</th><th>Time</th><th>Customer</th><th>Table</th><th>Items</th><th style="text-align:right">Total</th>
-            </tr>
-          </thead>
-          <tbody id="salesTableBody"></tbody>
-        </table>
-        <div id="salesEmpty" class="no-data" style="display:none">No orders placed yet today.</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button onclick="printDailyReport()" class="btn-close" style="border-color:var(--sage);color:var(--sage-dark);">🖨️ Print Report</button>
+        <button class="btn-close" onclick="closeSales()">✕ Close</button>
       </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <div style="display:flex;border-bottom:1px solid var(--parchment);background:var(--cream);flex-shrink:0;">
+      <button class="sales-tab active" id="stab-today" onclick="switchSalesTab('today')">☀️ Today</button>
+      <button class="sales-tab" id="stab-history" onclick="switchSalesTab('history')">📅 Past Days</button>
+    </div>
+
+    <!-- TODAY TAB -->
+    <div class="full-panel-body" id="sales-today-panel">
+      <div class="sales-stats" id="salesStats"></div>
+
+      <!-- Category Breakdown -->
+      <div class="sales-section-title">📂 Category Breakdown</div>
+      <div id="salesCatBreakdown" class="cat-breakdown-grid"></div>
+
+      <!-- Top Items -->
+      <div class="sales-section-title" style="margin-top:1.2rem;">⭐ Top Selling Items</div>
+      <div id="salesTopItems"></div>
+
+      <!-- Table Breakdown -->
+      <div class="sales-section-title" style="margin-top:1.2rem;">🪑 Table Breakdown</div>
+      <div id="salesTableBreakdown"></div>
+    </div>
+
+    <!-- PAST DAYS TAB -->
+    <div class="full-panel-body" id="sales-history-panel" style="display:none;">
+      <div id="salesHistoryList"><div class="no-data">Loading past days...</div></div>
     </div>
   </div>
 </div>
+
+<!-- PRINTABLE REPORT (hidden, shown on print) -->
+<div id="printReport" style="display:none;"></div>
 
 <!-- MOBILE BOTTOM NAV -->
 <nav class="mobile-nav">
@@ -929,7 +1099,7 @@
       <div class="sheet-title">🛒 Current Order</div>
       <button class="sheet-close" onclick="closeMobileCart()">✕</button>
     </div>
-    <div class="cust-row" style="padding:0.8rem 1.3rem;border-bottom:1px solid var(--parchment);display:grid;grid-template-columns:1fr 80px;gap:0.6rem;">
+    <div class="cust-row" style="padding:0.4rem 1rem;border-bottom:1px solid var(--parchment);display:grid;grid-template-columns:1fr 72px;gap:0.4rem;align-items:end;">
       <div class="f">
         <label>Customer Name</label>
         <input type="text" id="custNameM" name="custNameM" placeholder="e.g. Ram Bahadur" oninput="syncInputs('custName','custNameM')" aria-label="Customer name">
@@ -1237,25 +1407,32 @@ function renderOrderList(allOrders, body) {
     return;
   }
   body.innerHTML = allOrders.map((o, i) => {
-    // Support both DB format (customer_name, table_no) and local format (name, table)
     const name = o.customer_name || o.name || 'Guest';
     const table = o.table_no || o.table || '—';
     const items = o.items || [];
     const total = o.total || 0;
-    const oid = o.id ? '#' + String(o.id).padStart(4, '0') : (o.oid || '—');
+    const dbId = o.id || null;
+    const oid = dbId ? '#' + String(dbId).padStart(4, '0') : (o.oid || '—');
     const time = o.created_at
       ? new Date(o.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
       : (o.time || '—');
     return `
-      <div class="order-block" id="ob${i}">
-        <div class="order-block-head" onclick="toggleBlock(${i})">
-          <div class="ob-id">${oid}</div>
-          <div class="ob-name">${name}</div>
-          <div class="ob-table">${table}</div>
-          <div class="ob-count" style="font-size:0.72rem;color:var(--muted)">${time}</div>
-          <div class="ob-count">${items.reduce((s,c)=>s+(c.qty||1),0)} items</div>
-          <div class="ob-total">Rs. ${total}</div>
-          <div class="ob-arrow">▼</div>
+      <div class="order-block" id="ob${i}" data-dbid="${dbId||''}">
+        <div class="order-block-head" style="grid-template-columns:28px 72px 1fr 50px 70px 55px 95px 32px;">
+          <div onclick="event.stopPropagation()">
+            <input type="checkbox" class="order-cb" data-dbid="${dbId||''}" data-idx="${i}"
+              onchange="onOrderCheckChange()" style="cursor:pointer;width:13px;height:13px;accent-color:var(--sage-dark)">
+          </div>
+          <div class="ob-id" onclick="toggleBlock(${i})">${oid}</div>
+          <div class="ob-name" onclick="toggleBlock(${i})">${name}</div>
+          <div class="ob-table" onclick="toggleBlock(${i})">${table}</div>
+          <div class="ob-count" style="font-size:0.72rem;color:var(--muted)" onclick="toggleBlock(${i})">${time}</div>
+          <div class="ob-count" onclick="toggleBlock(${i})">${items.reduce((s,c)=>s+(c.qty||1),0)} items</div>
+          <div class="ob-total" onclick="toggleBlock(${i})">Rs. ${total}</div>
+          <div onclick="event.stopPropagation();deleteSingleOrder(${dbId||'null'},${i})"
+            title="Delete this order"
+            style="cursor:pointer;text-align:center;color:var(--red);font-size:1rem;padding:2px 4px;border-radius:6px;transition:background 0.15s;"
+            onmouseover="this.style.background='#fdecea'" onmouseout="this.style.background='none'">🗑️</div>
         </div>
         <div class="order-items-detail">
           <div class="detail-section-title">Order Items — ${time}</div>
@@ -1281,6 +1458,65 @@ function renderOrderList(allOrders, body) {
         </div>
       </div>`;
   }).join('');
+}
+
+function onOrderCheckChange() {
+  const cbs = document.querySelectorAll('.order-cb');
+  const checked = document.querySelectorAll('.order-cb:checked');
+  const bar = document.getElementById('bulkDeleteBar');
+  const count = document.getElementById('bulkCount');
+  if (checked.length > 0) {
+    bar.style.display = 'flex';
+    count.textContent = checked.length + ' order' + (checked.length>1?'s':'') + ' selected';
+  } else {
+    bar.style.display = 'none';
+  }
+  document.getElementById('selectAllOrders').checked = checked.length === cbs.length;
+}
+
+function toggleSelectAll(cb) {
+  document.querySelectorAll('.order-cb').forEach(c => c.checked = cb.checked);
+  onOrderCheckChange();
+}
+
+function clearBulkSelection() {
+  document.querySelectorAll('.order-cb').forEach(c => c.checked = false);
+  document.getElementById('selectAllOrders').checked = false;
+  document.getElementById('bulkDeleteBar').style.display = 'none';
+}
+
+function deleteSingleOrder(dbId, idx) {
+  if (!confirm('Delete this order?')) return;
+  if (dbId && dbId !== 'null') {
+    fetch(`${API_BASE}/api/orders?id=${dbId}`, { method: 'DELETE' })
+      .then(() => { history.splice(idx,1); refreshHistoryPanel(); })
+      .catch(() => { history.splice(idx,1); refreshHistoryPanel(); });
+  } else {
+    history.splice(idx,1);
+    refreshHistoryPanel();
+  }
+}
+
+function deleteSelectedOrders() {
+  const checked = document.querySelectorAll('.order-cb:checked');
+  if (!checked.length) return;
+  if (!confirm(`Delete ${checked.length} selected order(s)?`)) return;
+  const ids = [...checked].map(cb => cb.getAttribute('data-dbid')).filter(id => id && id !== '');
+  const idxs = [...checked].map(cb => parseInt(cb.getAttribute('data-idx'))).sort((a,b)=>b-a);
+  // Delete from DB if possible (bulk: we delete one by one)
+  const deletePromises = ids.map(id => fetch(`${API_BASE}/api/orders?id=${id}`, { method:'DELETE' }).catch(()=>{}));
+  Promise.all(deletePromises).finally(() => {
+    idxs.forEach(i => history.splice(i, 1));
+    clearBulkSelection();
+    refreshHistoryPanel();
+  });
+}
+
+function refreshHistoryPanel() {
+  const rev = history.reduce((s,o)=>s+(o.total||0),0);
+  document.getElementById('hOrders').textContent = history.length;
+  document.getElementById('hRevenue').textContent = 'Rs. ' + rev;
+  renderOrderList(history, document.getElementById('histBody'));
 }
 
 function openHistory(){
@@ -1330,120 +1566,363 @@ function confirmClearHistory() {
 
 // ── TABLE MANAGEMENT ──
 const TABLES_DEF = [
-  { id:1,  label:'Table 1',        seats:4,  type:'regular' },
-  { id:2,  label:'Table 2',        seats:4,  type:'regular' },
-  { id:3,  label:'Table 3',        seats:4,  type:'regular' },
-  { id:4,  label:'Table 4',        seats:4,  type:'regular' },
-  { id:5,  label:'Table 5',        seats:4,  type:'regular' },
-  { id:6,  label:'Table 6',        seats:4,  type:'regular' },
-  { id:7,  label:'Table 7',        seats:4,  type:'regular' },
-  { id:8,  label:'Table 8',        seats:4,  type:'regular' },
-  { id:9,  label:'Table 9',        seats:4,  type:'regular' },
-  { id:10, label:'The Long Table', seats:20, type:'large'   },
+  // 2 six-sitters
+  { id:'1',  label:'Table 1',  seats:6,  type:'regular' },
+  { id:'2',  label:'Table 2',  seats:6,  type:'regular' },
+  // 5 four-sitters
+  { id:'3',  label:'Table 3',  seats:4,  type:'regular' },
+  { id:'4',  label:'Table 4',  seats:4,  type:'regular' },
+  { id:'5',  label:'Table 5',  seats:4,  type:'regular' },
+  { id:'6',  label:'Table 6',  seats:4,  type:'regular' },
+  { id:'7',  label:'Table 7',  seats:4,  type:'regular' },
+  // 4 two-sitters
+  { id:'8',  label:'Table 8',  seats:2,  type:'regular' },
+  { id:'9',  label:'Table 9',  seats:2,  type:'regular' },
+  { id:'10', label:'Table 10', seats:2,  type:'regular' },
+  { id:'11', label:'Table 11', seats:2,  type:'regular' },
+  // 1 ten-sitter
+  { id:'12', label:'The Long Table', seats:10, type:'large' },
 ];
-let tableOrders = {}; // { tableId: { order } }
+
+// tableOrders: { tableId: [ ...orders ] }  (multiple orders per table)
+let tableOrders = {};
 
 function openTables() {
-  renderTablesGrid();
+  renderFloorMap();
   document.getElementById('tablesOverlay').classList.add('show');
 }
 function closeTables() {
   document.getElementById('tablesOverlay').classList.remove('show');
 }
+function closeTableDetail() {
+  document.getElementById('tableDetailOverlay').classList.remove('show');
+}
 
-function renderTablesGrid() {
-  const grid = document.getElementById('tablesGrid');
+function renderFloorMap() {
+  const grid = document.getElementById('floorMap');
   grid.innerHTML = TABLES_DEF.map(t => {
-    const o = tableOrders[t.id];
+    const orders = tableOrders[t.id] || [];
+    const occupied = orders.length > 0;
     const isLarge = t.type === 'large';
-    if (o) {
-      const itemList = o.items.map(c => `${c.emoji} ${c.name} ×${c.qty}`).join(', ');
-      return `<div class="table-card occupied${isLarge ? ' large-table' : ''}">
-        <div class="tc-head">
-          <div><div class="tc-name">${t.label}</div><div class="tc-seats">🪑 up to ${t.seats} seats</div></div>
-          <span class="tc-badge occ">Occupied</span>
+    const totalAmt = orders.reduce((s,o) => s+(o.total||0), 0);
+    const firstItems = occupied ? orders[0].items.slice(0,2).map(c=>`${c.emoji||''} ${c.name}`).join(', ') + (orders[0].items.length > 2 ? '…' : '') : '';
+
+    return `<div class="floor-table${occupied?' occupied':''}${isLarge?' long-table':''}" onclick="openTableDetail('${t.id}')">
+      <div class="ft-top">
+        <div>
+          <div class="ft-name">${isLarge ? '🪑 ' : '🍽️ '}${t.label}</div>
+          <div class="ft-seats">up to ${t.seats} seats</div>
         </div>
-        <div class="tc-items">${itemList}</div>
-        <div class="tc-total">Total: Rs. ${o.total}</div>
-        <button class="tc-clear" onclick="clearTableOrder(${t.id})">✓ Mark as Cleared</button>
-      </div>`;
-    } else {
-      return `<div class="table-card${isLarge ? ' large-table' : ''}">
-        <div class="tc-head">
-          <div><div class="tc-name">${t.label}</div><div class="tc-seats">🪑 up to ${t.seats} seats</div></div>
-          <span class="tc-badge avail">Available</span>
-        </div>
-        <div class="tc-empty">🌿</div>
-      </div>`;
-    }
+        <span class="ft-badge ${occupied?'occ':'avail'}">${occupied?'Occupied':'Available'}</span>
+      </div>
+      ${occupied
+        ? `<div class="ft-preview">${firstItems}</div>
+           <div class="ft-total">Rs. ${totalAmt} · ${orders.length} order${orders.length>1?'s':''}</div>`
+        : `<div class="ft-empty">🌿</div>`
+      }
+    </div>`;
   }).join('');
 }
 
-function clearTableOrder(id) {
-  delete tableOrders[id];
-  renderTablesGrid();
-}
+function openTableDetail(tableId) {
+  const t = TABLES_DEF.find(x => x.id === tableId);
+  const orders = tableOrders[tableId] || [];
+  document.getElementById('tableDetailTitle').textContent = `🍽️ ${t.label}`;
 
-// ── SALES DASHBOARD ──
-function openSales() {
-  renderSalesDashboard();
-  document.getElementById('salesOverlay').classList.add('show');
-}
-function closeSales() {
-  document.getElementById('salesOverlay').classList.remove('show');
-}
-
-function renderSalesDashboard() {
-  const allOrders = [...history];
-  const totalRev = allOrders.reduce((s,o) => s+o.total, 0);
-  const avgOrder = allOrders.length ? Math.round(totalRev / allOrders.length) : 0;
-
-  // Count top item
-  const itemCounts = {};
-  allOrders.forEach(o => o.items.forEach(i => { itemCounts[i.name] = (itemCounts[i.name]||0)+i.qty; }));
-  const topEntry = Object.entries(itemCounts).sort((a,b)=>b[1]-a[1])[0];
-  const topItem = topEntry ? topEntry[0] : '—';
-
-  document.getElementById('salesStats').innerHTML = [
-    { icon:'💰', label:"Today's Revenue", value:'Rs. '+totalRev },
-    { icon:'📋', label:'Orders Placed',   value: allOrders.length },
-    { icon:'📈', label:'Average Order',   value:'Rs. '+avgOrder },
-    { icon:'⭐', label:'Top Item',        value: topItem },
-  ].map(s => `
-    <div class="stat-card">
-      <div class="stat-icon">${s.icon}</div>
-      <div class="stat-label">${s.label}</div>
-      <div class="stat-value">${s.value}</div>
-    </div>`).join('');
-
-  const tbody = document.getElementById('salesTableBody');
-  const empty = document.getElementById('salesEmpty');
-  if (!allOrders.length) {
-    tbody.innerHTML = '';
-    empty.style.display = 'block';
+  const body = document.getElementById('tableDetailBody');
+  if (!orders.length) {
+    body.innerHTML = `<div style="text-align:center;padding:2.5rem;color:var(--muted);opacity:0.5;">
+      <div style="font-size:2rem;margin-bottom:8px;">🌿</div>
+      <div>Table is available</div>
+    </div>`;
   } else {
-    empty.style.display = 'none';
-    tbody.innerHTML = allOrders.map(o => `
-      <tr>
-        <td style="font-weight:700;color:var(--sage-dark)">${o.id}</td>
-        <td style="color:var(--muted)">${o.time}</td>
-        <td>${o.name}</td>
-        <td style="color:var(--muted)">${o.table}</td>
-        <td style="color:var(--muted);font-size:0.73rem">${o.items.map(c=>`${c.emoji}${c.name}×${c.qty}`).join(', ')}</td>
-        <td style="text-align:right;font-weight:700;color:var(--sage-dark)">Rs. ${o.total}</td>
-      </tr>`).join('');
+    const totalAll = orders.reduce((s,o)=>s+(o.total||0),0);
+    body.innerHTML = `
+      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);font-weight:600;margin-bottom:12px;">
+        ${orders.length} order${orders.length>1?'s':''} · Total Rs. ${totalAll}
+      </div>
+      ${orders.map((o,i) => {
+        const name = o.customer_name || o.name || 'Guest';
+        const time = o.created_at
+          ? new Date(o.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})
+          : (o.time || '');
+        return `<div class="td-order-card">
+          <div class="td-order-meta">
+            <span>👤 ${name}</span>
+            <span>🕐 ${time}</span>
+          </div>
+          ${o.items.map(c=>`
+            <div class="td-item-row">
+              <span>${c.emoji||'🍽️'}</span>
+              <span style="flex:1">${c.name}</span>
+              <span style="color:var(--muted)">×${c.qty||1}</span>
+              <span style="color:var(--sage-dark);font-weight:600">Rs.${c.price*(c.qty||1)}</span>
+            </div>`).join('')}
+          <div class="td-total">Rs. ${o.total}</div>
+        </div>`;
+      }).join('')}
+      <button class="td-clear-btn" onclick="clearTable('${tableId}')">✓ Mark Table as Unoccupied</button>
+    `;
   }
+  document.getElementById('tableDetailOverlay').classList.add('show');
 }
 
-// Patch placeOrder to also store table occupancy
+function clearTable(tableId) {
+  if (!confirm('Mark this table as unoccupied?')) return;
+  delete tableOrders[tableId];
+  closeTableDetail();
+  renderFloorMap();
+}
+// ── SALES DASHBOARD ──
+// ── SALES DASHBOARD ──
+const CAT_MAP = {
+  'Breakfast': '🍳 Breakfast',
+  'Food Menu': '🥟 Food Menu',
+  'Snacks':    '🍟 Snacks',
+  'Appetizer': '🥗 Appetizer',
+  'Hot Drinks':'☕ Hot Drinks',
+  'Cold Drinks':'🧊 Cold Drinks',
+  'Alcoholic': '🍺 Alcoholic',
+};
+
+function openSales() {
+  switchSalesTab('today');
+  document.getElementById('salesOverlay').classList.add('show');
+  checkMidnightRollover();
+}
+function closeSales() { document.getElementById('salesOverlay').classList.remove('show'); }
+
+function switchSalesTab(tab) {
+  document.querySelectorAll('.sales-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('stab-'+tab).classList.add('active');
+  document.getElementById('sales-today-panel').style.display = tab==='today' ? '' : 'none';
+  document.getElementById('sales-history-panel').style.display = tab==='history' ? '' : 'none';
+  if (tab==='today') renderTodaySales();
+  if (tab==='history') renderPastDays();
+}
+
+function analyzeOrders(orders) {
+  const totalRev = orders.reduce((s,o)=>s+(o.total||0),0);
+  const avgOrder = orders.length ? Math.round(totalRev/orders.length) : 0;
+
+  // Item counts
+  const itemMap = {};
+  orders.forEach(o=>(o.items||[]).forEach(it=>{
+    if(!itemMap[it.name]) itemMap[it.name]={qty:0,rev:0,cat:it.category||''};
+    itemMap[it.name].qty += (it.qty||1);
+    itemMap[it.name].rev += it.price*(it.qty||1);
+  }));
+  const topItems = Object.entries(itemMap).sort((a,b)=>b[1].qty-a[1].qty).slice(0,8);
+
+  // Category totals
+  const catMap = {};
+  orders.forEach(o=>(o.items||[]).forEach(it=>{
+    const cat = it.category || 'Other';
+    if(!catMap[cat]) catMap[cat]={rev:0,qty:0};
+    catMap[cat].rev += it.price*(it.qty||1);
+    catMap[cat].qty += (it.qty||1);
+  }));
+
+  // Table totals
+  const tableMap = {};
+  orders.forEach(o=>{
+    const tbl = o.table_no||o.table||'—';
+    if(!tableMap[tbl]) tableMap[tbl]={rev:0,orders:0};
+    tableMap[tbl].rev += (o.total||0);
+    tableMap[tbl].orders++;
+  });
+
+  return { totalRev, avgOrder, topItems, catMap, tableMap, count: orders.length };
+}
+
+function renderTodaySales() {
+  fetch(`${API_BASE}/api/orders`)
+    .then(r=>r.json())
+    .then(orders=>{
+      const d = analyzeOrders(orders);
+
+      // Stats
+      document.getElementById('salesStats').innerHTML = [
+        { icon:'💰', label:"Today's Revenue", value:'Rs. '+d.totalRev },
+        { icon:'📋', label:'Orders Placed',   value: d.count },
+        { icon:'📈', label:'Avg Order',       value:'Rs. '+d.avgOrder },
+        { icon:'⭐', label:'Top Item',        value: d.topItems[0]?d.topItems[0][0]:'—' },
+      ].map(s=>`<div class="stat-card"><div class="stat-icon">${s.icon}</div><div class="stat-label">${s.label}</div><div class="stat-value">${s.value}</div></div>`).join('');
+
+      // Category breakdown
+      const cats = Object.entries(d.catMap).sort((a,b)=>b[1].rev-a[1].rev);
+      document.getElementById('salesCatBreakdown').innerHTML = cats.length
+        ? cats.map(([cat,v])=>`<div class="cat-card">
+            <div class="cat-card-name">${cat}</div>
+            <div class="cat-card-val">Rs. ${v.rev}</div>
+            <div class="cat-card-sub">${v.qty} items sold</div>
+          </div>`).join('')
+        : '<div class="no-data" style="padding:1rem">No data yet</div>';
+
+      // Top items
+      const maxQty = d.topItems[0]?d.topItems[0][1].qty:1;
+      document.getElementById('salesTopItems').innerHTML = d.topItems.length
+        ? d.topItems.map(([name,v],i)=>`<div class="top-item-row">
+            <div class="ti-rank">${i+1}</div>
+            <div class="ti-name">${name}</div>
+            <div class="ti-bar-wrap"><div class="ti-bar" style="width:${Math.round(v.qty/maxQty*100)}%"></div></div>
+            <div class="ti-qty">×${v.qty}</div>
+            <div class="ti-rev">Rs. ${v.rev}</div>
+          </div>`).join('')
+        : '<div class="no-data" style="padding:1rem">No data yet</div>';
+
+      // Table breakdown
+      const tables = Object.entries(d.tableMap).sort((a,b)=>b[1].rev-a[1].rev);
+      document.getElementById('salesTableBreakdown').innerHTML = tables.length
+        ? tables.map(([tbl,v])=>`<div class="tbl-breakdown-row">
+            <span style="flex:1;font-weight:600">Table ${tbl}</span>
+            <span style="color:var(--muted);font-size:0.75rem">${v.orders} order${v.orders>1?'s':''}</span>
+            <span style="font-weight:700;color:var(--sage-dark);min-width:80px;text-align:right">Rs. ${v.rev}</span>
+          </div>`).join('')
+        : '<div class="no-data" style="padding:1rem">No table data yet</div>';
+
+      // Store for printing
+      window._todayAnalysis = { orders, ...d };
+    })
+    .catch(()=>{ document.getElementById('salesStats').innerHTML='<div class="no-data">Could not load data</div>'; });
+}
+
+function renderPastDays() {
+  fetch(`${API_BASE}/api/daily`)
+    .then(r=>r.json())
+    .then(days=>{
+      if(!days.length){
+        document.getElementById('salesHistoryList').innerHTML='<div class="no-data" style="padding:3rem">No past day records yet.<br><small>Data saves automatically at midnight.</small></div>';
+        return;
+      }
+      document.getElementById('salesHistoryList').innerHTML = days.map(day=>{
+        const cats = day.category_totals ? Object.entries(day.category_totals).sort((a,b)=>b[1].rev-a[1].rev).slice(0,3).map(([c,v])=>`${c}: Rs.${v.rev}`).join(' · ') : '';
+        const dateStr = new Date(day.date+'T00:00:00').toLocaleDateString('en-NP',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+        return `<div class="day-summary-card" onclick="openDayDetail(${JSON.stringify(day).replace(/"/g,'&quot;')})">
+          <div class="day-card-head">
+            <div class="day-card-date">📅 ${dateStr}</div>
+            <div class="day-card-rev">Rs. ${day.total_revenue}</div>
+          </div>
+          <div class="day-card-meta">
+            <span>📋 ${day.total_orders} orders</span>
+            ${day.top_items&&day.top_items[0]?`<span>⭐ ${day.top_items[0][0]}</span>`:''}
+            ${cats?`<span>${cats}</span>`:''}
+          </div>
+        </div>`;
+      }).join('');
+    })
+    .catch(()=>{ document.getElementById('salesHistoryList').innerHTML='<div class="no-data">Could not load history</div>'; });
+}
+
+function openDayDetail(day) {
+  const dateStr = new Date(day.date+'T00:00:00').toLocaleDateString('en-NP',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  window._printDay = day;
+  window._printDate = dateStr;
+  printDailyReport(day, dateStr);
+}
+
+// ── MIDNIGHT ROLLOVER ──
+let _lastCheckedDate = new Date().toDateString();
+function checkMidnightRollover() {
+  const now = new Date();
+  const todayStr = now.toDateString();
+  if (todayStr === _lastCheckedDate) return;
+  // Date changed — save yesterday's data
+  const yesterday = new Date(now - 86400000).toISOString().split('T')[0];
+  saveDailySummary(yesterday);
+  _lastCheckedDate = todayStr;
+}
+
+function saveDailySummary(dateStr) {
+  fetch(`${API_BASE}/api/orders`)
+    .then(r=>r.json())
+    .then(orders=>{
+      if(!orders.length) return;
+      const d = analyzeOrders(orders);
+      fetch(`${API_BASE}/api/daily`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          date: dateStr,
+          total_revenue: d.totalRev,
+          total_orders: d.count,
+          top_items: d.topItems,
+          category_totals: d.catMap,
+          table_totals: d.tableMap,
+        })
+      }).then(()=>{
+        // Clear orders after saving
+        fetch(`${API_BASE}/api/orders`,{method:'DELETE'});
+        history.length = 0;
+      });
+    });
+}
+
+// Auto-check every minute
+setInterval(checkMidnightRollover, 60000);
+
+// ── PRINT REPORT ──
+function printDailyReport(day, dateStr) {
+  const isToday = !day;
+  const data = isToday ? window._todayAnalysis : null;
+  const title = isToday ? 'Today\'s Sales Report' : dateStr;
+  const todayFormatted = new Date().toLocaleDateString('en-NP',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  const revenue    = isToday ? (data?.totalRev||0)  : (day?.total_revenue||0);
+  const orderCount = isToday ? (data?.count||0)      : (day?.total_orders||0);
+  const avgOrder   = isToday ? (data?.avgOrder||0)   : (orderCount ? Math.round(revenue/orderCount) : 0);
+  const topItems   = isToday ? (data?.topItems||[])  : (day?.top_items||[]);
+  const catMap     = isToday ? (data?.catMap||{})    : (day?.category_totals||{});
+  const tableMap   = isToday ? (data?.tableMap||{})  : (day?.table_totals||{});
+
+  const catRows = Object.entries(catMap).sort((a,b)=>b[1].rev-a[1].rev)
+    .map(([cat,v])=>`<tr><td>${cat}</td><td>${v.qty} items</td><td style="text-align:right;font-weight:bold">Rs. ${v.rev}</td></tr>`).join('');
+  const topRows = topItems.slice(0,10)
+    .map(([name,v],i)=>`<tr><td>${i+1}</td><td>${name}</td><td>${v.qty}</td><td style="text-align:right;font-weight:bold">Rs. ${v.rev}</td></tr>`).join('');
+  const tblRows = Object.entries(tableMap).sort((a,b)=>b[1].rev-a[1].rev)
+    .map(([tbl,v])=>`<tr><td>Table ${tbl}</td><td>${v.orders} order${v.orders>1?'s':''}</td><td style="text-align:right;font-weight:bold">Rs. ${v.rev}</td></tr>`).join('');
+
+  document.getElementById('printReport').innerHTML = `
+    <div class="print-section">
+      <div class="print-title">☕ Trio's Café — Sales Report</div>
+      <div class="print-subtitle">${isToday ? todayFormatted : dateStr} · Printed: ${new Date().toLocaleString()}</div>
+      <table class="print-table">
+        <tr><th>Total Revenue</th><th>Orders</th><th>Avg Order</th></tr>
+        <tr><td><strong>Rs. ${revenue}</strong></td><td>${orderCount}</td><td>Rs. ${avgOrder}</td></tr>
+      </table>
+    </div>
+    <div class="print-section">
+      <div class="print-h2">📂 Category Breakdown</div>
+      <table class="print-table"><thead><tr><th>Category</th><th>Items Sold</th><th>Revenue</th></tr></thead><tbody>${catRows||'<tr><td colspan="3">No data</td></tr>'}</tbody></table>
+    </div>
+    <div class="print-section">
+      <div class="print-h2">⭐ Top Selling Items</div>
+      <table class="print-table"><thead><tr><th>#</th><th>Item</th><th>Qty</th><th>Revenue</th></tr></thead><tbody>${topRows||'<tr><td colspan="4">No data</td></tr>'}</tbody></table>
+    </div>
+    <div class="print-section">
+      <div class="print-h2">🪑 Table Breakdown</div>
+      <table class="print-table"><thead><tr><th>Table</th><th>Orders</th><th>Revenue</th></tr></thead><tbody>${tblRows||'<tr><td colspan="3">No data</td></tr>'}</tbody></table>
+    </div>
+  `;
+  window.print();
+}
+
+// Patch placeOrder to auto-occupy table when order is placed
 const _origPlaceOrder = placeOrder;
 placeOrder = function() {
-  // We intercept AFTER the original succeeds via a flag
-  const tableVal = document.getElementById('tableNo').value || document.getElementById('tableNoM').value || '—';
+  const tableVal = (document.getElementById('tableNo') && document.getElementById('tableNo').value)
+    || (document.getElementById('tableNoM') && document.getElementById('tableNoM').value) || '—';
   const cartSnap = [...cart];
   const totalSnap = cart.reduce((s,c)=>s+c.price*c.qty,0);
+  const nameVal = (document.getElementById('custName') && document.getElementById('custName').value)
+    || (document.getElementById('custNameM') && document.getElementById('custNameM').value) || 'Guest';
   if (tableVal && tableVal !== '—' && cartSnap.length) {
-    tableOrders[tableVal] = { items: cartSnap, total: totalSnap, time: new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) };
+    if (!tableOrders[tableVal]) tableOrders[tableVal] = [];
+    tableOrders[tableVal].push({
+      items: cartSnap, total: totalSnap,
+      name: nameVal,
+      time: new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})
+    });
   }
   _origPlaceOrder();
 };
