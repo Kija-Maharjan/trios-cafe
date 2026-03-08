@@ -762,7 +762,8 @@
     </div>
     <div class="menu-top">
       <div class="menu-heading" id="menuHeading">🍳 Breakfast</div>
-      <input class="search-box" type="text" placeholder="Search menu…" oninput="doSearch(this.value)">
+      <label for="menuSearch" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Search menu</label>
+      <input class="search-box" id="menuSearch" name="menuSearch" type="text" placeholder="Search menu…" oninput="doSearch(this.value)" aria-label="Search menu items">
     </div>
     <div class="items-grid" id="grid"></div>
   </main>
@@ -775,11 +776,11 @@
     <div class="cust-row">
       <div class="f">
         <label>Customer Name</label>
-        <input type="text" id="custName" placeholder="e.g. Ram Bahadur">
+        <input type="text" id="custName" name="custName" placeholder="e.g. Ram Bahadur" aria-label="Customer name">
       </div>
       <div class="f">
         <label>Table #</label>
-        <input type="number" id="tableNo" placeholder="1" min="1">
+        <input type="number" id="tableNo" name="tableNo" placeholder="1" min="1" aria-label="Table number">
       </div>
     </div>
     <div class="cart-list" id="cartList">
@@ -927,11 +928,11 @@
     <div class="cust-row" style="padding:0.8rem 1.3rem;border-bottom:1px solid var(--parchment);display:grid;grid-template-columns:1fr 80px;gap:0.6rem;">
       <div class="f">
         <label>Customer Name</label>
-        <input type="text" id="custNameM" placeholder="e.g. Ram Bahadur" oninput="syncInputs('custName','custNameM')">
+        <input type="text" id="custNameM" name="custNameM" placeholder="e.g. Ram Bahadur" oninput="syncInputs('custName','custNameM')" aria-label="Customer name">
       </div>
       <div class="f">
         <label>Table #</label>
-        <input type="number" id="tableNoM" placeholder="1" min="1" oninput="syncInputs('tableNo','tableNoM')">
+        <input type="number" id="tableNoM" name="tableNoM" placeholder="1" min="1" oninput="syncInputs('tableNo','tableNoM')" aria-label="Table number">
       </div>
     </div>
     <div class="sheet-body" id="mobileCartList">
