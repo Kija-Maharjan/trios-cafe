@@ -1217,103 +1217,77 @@ function newOrder(){
   document.getElementById('tableNo').value='';
 }
 
+function renderOrderList(allOrders, body) {
+  if (!allOrders.length) {
+    body.innerHTML = `<div class="no-orders">No orders placed yet today.</div>`;
+    return;
+  }
+  body.innerHTML = allOrders.map((o, i) => {
+    // Support both DB format (customer_name, table_no) and local format (name, table)
+    const name = o.customer_name || o.name || 'Guest';
+    const table = o.table_no || o.table || '—';
+    const items = o.items || [];
+    const total = o.total || 0;
+    const oid = o.id ? '#' + String(o.id).padStart(4, '0') : (o.oid || '—');
+    const time = o.created_at
+      ? new Date(o.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+      : (o.time || '—');
+    return `
+      <div class="order-block" id="ob${i}">
+        <div class="order-block-head" onclick="toggleBlock(${i})">
+          <div class="ob-id">${oid}</div>
+          <div class="ob-name">${name}</div>
+          <div class="ob-table">${table}</div>
+          <div class="ob-count">${items.reduce((s,c)=>s+(c.qty||1),0)} items</div>
+          <div class="ob-total">Rs. ${total}</div>
+          <div class="ob-arrow">▼</div>
+        </div>
+        <div class="order-items-detail">
+          <div class="detail-section-title">Order Items — ${time}</div>
+          ${items.map(c=>`
+            <div class="detail-row">
+              <div class="de">${c.emoji||'🍽️'}</div>
+              <div class="dn">${c.name}</div>
+              <div class="dq">×${c.qty||1}</div>
+              <div class="du">Rs.${c.price} each</div>
+              <div class="dp">Rs. ${c.price*(c.qty||1)}</div>
+            </div>`).join('')}
+          <div class="detail-totals">
+            <div class="dt-item">
+              <div class="dt-label">Total Paid</div>
+              <div class="dt-val grand">Rs. ${total}</div>
+            </div>
+          </div>
+          <div class="detail-meta">
+            <span>🕐 ${time}</span>
+            <span>🪑 Table ${table}</span>
+            <span>👤 ${name}</span>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
 function openHistory(){
-  // Try to fetch from API
   fetch(`${API_BASE}/api/orders`)
     .then(res => res.json())
     .then(dbOrders => {
-      // Merge with local history
-      const allOrders = [...history];
-      
-      const rev = allOrders.reduce((s,o)=>s+o.total,0);
+      // Use DB orders as the source of truth
+      const allOrders = dbOrders && dbOrders.length ? dbOrders : [...history];
+      const rev = allOrders.reduce((s,o)=>s+(o.total||0),0);
       document.getElementById('hOrders').textContent = allOrders.length;
       document.getElementById('hRevenue').textContent = 'Rs. ' + rev;
       const body = document.getElementById('histBody');
-      
-      if(!allOrders.length){
-        body.innerHTML=`<div class="no-orders">No orders placed yet today.</div>`;
-      } else {
-        body.innerHTML=allOrders.map((o,i)=>`
-          <div class="order-block" id="ob${i}">
-            <div class="order-block-head" onclick="toggleBlock(${i})">
-              <div class="ob-id">${o.id}</div>
-              <div class="ob-name">${o.name}</div>
-              <div class="ob-table">${o.table}</div>
-              <div class="ob-count">${o.items.reduce((s,c)=>s+c.qty,0)} items</div>
-              <div class="ob-total">Rs. ${o.total}</div>
-              <div class="ob-arrow">▼</div>
-            </div>
-            <div class="order-items-detail">
-              <div class="detail-section-title">Order Items — ${o.time}</div>
-              ${o.items.map(c=>`
-                <div class="detail-row">
-                  <div class="de">${c.emoji}</div>
-                  <div class="dn">${c.name}</div>
-                  <div class="dq">×${c.qty}</div>
-                  <div class="du">Rs.${c.price} each</div>
-                  <div class="dp">Rs. ${c.price*c.qty}</div>
-                </div>`).join('')}
-              <div class="detail-totals">
-                <div class="dt-item">
-                  <div class="dt-label">Total Paid</div>
-                  <div class="dt-val grand">Rs. ${o.total}</div>
-                </div>
-              </div>
-              <div class="detail-meta">
-                <span>🕐 ${o.time}</span>
-                <span>🪑 Table ${o.table}</span>
-                <span>👤 ${o.name}</span>
-              </div>
-            </div>
-          </div>`).join('');
-      }
+      renderOrderList(allOrders, body);
       document.getElementById('histOverlay').classList.add('show');
     })
     .catch(err => {
       console.error('Error fetching history:', err);
-      // Use local history as fallback
       const rev = history.reduce((s,o)=>s+o.total,0);
       document.getElementById('hOrders').textContent = history.length;
       document.getElementById('hRevenue').textContent = 'Rs. ' + rev;
       const body = document.getElementById('histBody');
-      
-      if(!history.length){
-        body.innerHTML=`<div class="no-orders">No orders placed yet today.</div>`;
-      } else {
-        body.innerHTML=history.map((o,i)=>`
-          <div class="order-block" id="ob${i}">
-            <div class="order-block-head" onclick="toggleBlock(${i})">
-              <div class="ob-id">${o.id}</div>
-              <div class="ob-name">${o.name}</div>
-              <div class="ob-table">${o.table}</div>
-              <div class="ob-count">${o.items.reduce((s,c)=>s+c.qty,0)} items</div>
-              <div class="ob-total">Rs. ${o.total}</div>
-              <div class="ob-arrow">▼</div>
-            </div>
-            <div class="order-items-detail">
-              <div class="detail-section-title">Order Items — ${o.time}</div>
-              ${o.items.map(c=>`
-                <div class="detail-row">
-                  <div class="de">${c.emoji}</div>
-                  <div class="dn">${c.name}</div>
-                  <div class="dq">×${c.qty}</div>
-                  <div class="du">Rs.${c.price} each</div>
-                  <div class="dp">Rs. ${c.price*c.qty}</div>
-                </div>`).join('')}
-              <div class="detail-totals">
-                <div class="dt-item">
-                  <div class="dt-label">Total Paid</div>
-                  <div class="dt-val grand">Rs. ${o.total}</div>
-                </div>
-              </div>
-              <div class="detail-meta">
-                <span>🕐 ${o.time}</span>
-                <span>🪑 Table ${o.table}</span>
-                <span>👤 ${o.name}</span>
-              </div>
-            </div>
-          </div>`).join('');
-      }
+      renderOrderList(history, body);
       document.getElementById('histOverlay').classList.add('show');
     });
 }
