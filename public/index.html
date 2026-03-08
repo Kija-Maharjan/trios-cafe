@@ -1331,6 +1331,14 @@ function updateTotals(sub){
   document.getElementById('tTotal').textContent='Rs. '+sub;
 }
 
+function resetSession() {
+  clearCart();
+  document.getElementById('custName').value='';
+  document.getElementById('tableNo').value='';
+  document.getElementById('custNameM').value='';
+  document.getElementById('tableNoM').value='';
+}
+
 function placeOrder(){
   if(!cart.length){alert('Please add items first!');return;}
   const name=document.getElementById('custName').value.trim()||document.getElementById('custNameM').value.trim()||'Guest';
@@ -1354,11 +1362,10 @@ function placeOrder(){
     const oid = data.id ? '#' + String(data.id).padStart(4, '0') : '#' + String(++orderNum).padStart(4, '0');
     const now = new Date();
     const timeStr = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    // Add to local history too
     history.unshift({id:oid, customer_name:name, table_no:table, total, created_at:now.toISOString(), items:[...cart]});
-    // Auto update history stats if panel is open
     updateHistoryStats();
     showConfirmModal(oid, now, timeStr, name, table, total);
+    resetSession(); // ← auto reset immediately
   })
   .catch(err => {
     console.error('Error placing order:', err);
@@ -1368,6 +1375,7 @@ function placeOrder(){
     history.unshift({id:oid, customer_name:name, table_no:table, total, created_at:now.toISOString(), items:[...cart]});
     updateHistoryStats();
     showConfirmModal(oid, now, timeStr, name, table, total);
+    resetSession(); // ← auto reset even on error
   });
 }
 
@@ -1394,11 +1402,6 @@ function updateHistoryStats() {
 
 function newOrder(){
   document.getElementById('confirmOverlay').classList.remove('show');
-  clearCart();
-  document.getElementById('custName').value='';
-  document.getElementById('tableNo').value='';
-  document.getElementById('custNameM').value='';
-  document.getElementById('tableNoM').value='';
 }
 
 function renderOrderList(allOrders, body) {
