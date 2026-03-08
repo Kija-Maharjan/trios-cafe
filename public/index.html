@@ -388,7 +388,7 @@
 
   .hist-col-heads {
     display:grid;
-    grid-template-columns:72px 1fr 50px 55px 95px 22px;
+    grid-template-columns:72px 1fr 50px 70px 55px 95px 22px;
     gap:0.5rem;
     padding:0.5rem 1.8rem;
     background:var(--parchment);
@@ -405,7 +405,7 @@
 
   .order-block-head {
     display:grid;
-    grid-template-columns:72px 1fr 50px 55px 95px 22px;
+    grid-template-columns:72px 1fr 50px 70px 55px 95px 22px;
     gap:0.5rem;
     padding:0.85rem 1.8rem;
     cursor:pointer; align-items:center;
@@ -841,11 +841,13 @@
         </div>
       </div>
       <button class="btn-close" onclick="closeHistory()">✕ Close</button>
+      <button class="btn-close" onclick="confirmClearHistory()" style="border-color:var(--red);color:var(--red);margin-left:6px;">🗑️ Clear All</button>
     </div>
     <div class="hist-col-heads">
       <div>Order ID</div>
       <div>Customer</div>
       <div>Table</div>
+      <div>Time</div>
       <div>Items</div>
       <div style="text-align:right">Total</div>
       <div></div>
@@ -1239,6 +1241,7 @@ function renderOrderList(allOrders, body) {
           <div class="ob-id">${oid}</div>
           <div class="ob-name">${name}</div>
           <div class="ob-table">${table}</div>
+          <div class="ob-count" style="font-size:0.72rem;color:var(--muted)">${time}</div>
           <div class="ob-count">${items.reduce((s,c)=>s+(c.qty||1),0)} items</div>
           <div class="ob-total">Rs. ${total}</div>
           <div class="ob-arrow">▼</div>
@@ -1294,6 +1297,23 @@ function openHistory(){
 }
 function toggleBlock(i){document.getElementById('ob'+i).classList.toggle('expanded');}
 function closeHistory(){document.getElementById('histOverlay').classList.remove('show');}
+
+function confirmClearHistory() {
+  if (!confirm('⚠️ Are you sure you want to clear ALL order history? This cannot be undone.')) return;
+  fetch(`${API_BASE}/api/orders`, { method: 'DELETE' })
+    .then(res => res.json())
+    .then(() => {
+      history = [];
+      document.getElementById('hOrders').textContent = '0';
+      document.getElementById('hRevenue').textContent = 'Rs. 0';
+      document.getElementById('histBody').innerHTML = '<div class="no-orders">No orders placed yet today.</div>';
+      alert('✅ Order history cleared!');
+    })
+    .catch(err => {
+      console.error('Clear error:', err);
+      alert('Error clearing history. Please try again.');
+    });
+}
 
 // ── TABLE MANAGEMENT ──
 const TABLES_DEF = [
