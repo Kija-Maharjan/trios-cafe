@@ -472,18 +472,227 @@
   @keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   .fade { animation:fadeUp 0.26s ease both; }
 
-  /* Responsive: make menu-area full-width on small screens */
+  /* ── TABLES & SALES OVERLAYS ── */
+  .full-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(44,62,45,0.45); backdrop-filter: blur(6px);
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 20px; overflow-y: auto;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .full-overlay.show { opacity: 1; pointer-events: all; }
+  .full-panel {
+    background: var(--white); border-radius: 20px;
+    width: 100%; max-width: 900px;
+    box-shadow: 0 20px 60px rgba(44,62,45,0.18);
+    transform: scale(0.97) translateY(12px);
+    transition: transform 0.3s; overflow: hidden;
+    min-height: 300px;
+  }
+  .full-overlay.show .full-panel { transform: scale(1) translateY(0); }
+  .full-panel-head {
+    padding: 1.1rem 1.8rem;
+    border-bottom: 1px solid var(--parchment);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--cream);
+  }
+  .full-panel-title { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: var(--ink); }
+  .full-panel-body { padding: 1.4rem 1.8rem; }
+
+  /* Table cards */
+  .tables-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 14px;
+  }
+  .table-card {
+    border: 1.5px solid var(--parchment);
+    border-radius: 14px; padding: 1.1rem;
+    background: var(--white); transition: all 0.2s;
+  }
+  .table-card.occupied { border-color: var(--wheat); background: #fffaf2; }
+  .table-card.large-table { grid-column: 1 / -1; }
+  .tc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .tc-name { font-weight: 700; font-size: 0.9rem; color: var(--ink); }
+  .tc-seats { font-size: 0.68rem; color: var(--muted); margin-top: 1px; }
+  .tc-badge {
+    font-size: 0.65rem; font-weight: 700; padding: 3px 10px;
+    border-radius: 12px; letter-spacing: 0.05em;
+  }
+  .tc-badge.avail { background: #e8f5e9; color: #388e3c; }
+  .tc-badge.occ { background: #fff3e0; color: #e65100; }
+  .tc-items { font-size: 0.76rem; color: var(--muted); margin-bottom: 8px; line-height: 1.6; }
+  .tc-total { font-size: 0.88rem; font-weight: 700; color: var(--sage-dark); margin-bottom: 10px; }
+  .tc-clear {
+    width: 100%; padding: 7px; border-radius: 8px;
+    background: var(--sage); color: var(--white); border: none;
+    font-family: 'Jost', sans-serif; font-size: 0.78rem; font-weight: 600;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .tc-clear:hover { background: var(--sage-dark); }
+  .tc-empty { text-align: center; color: var(--muted); opacity: 0.3; font-size: 1.5rem; padding: 10px 0; }
+
+  /* Sales dashboard */
+  .sales-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 14px; margin-bottom: 24px;
+  }
+  .stat-card {
+    border-radius: 14px; padding: 1.1rem 1.2rem;
+    border: 1.5px solid var(--parchment);
+  }
+  .stat-icon { font-size: 1.5rem; margin-bottom: 8px; }
+  .stat-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); font-weight: 600; margin-bottom: 4px; }
+  .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; font-weight: 600; color: var(--sage-dark); }
+  .sales-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+  .sales-table th {
+    text-align: left; padding: 8px 12px;
+    font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--muted); background: var(--cream);
+    border-bottom: 1.5px solid var(--parchment);
+  }
+  .sales-table td { padding: 10px 12px; border-bottom: 1px solid var(--parchment); color: var(--ink); }
+  .sales-table tr:last-child td { border-bottom: none; }
+  .sales-table tr:hover td { background: var(--sage-pale); }
+  .no-data { text-align: center; padding: 3rem; color: var(--muted); opacity: 0.45; font-size: 0.84rem; }
+
+  /* Mobile nav extras */
+  @media (max-width: 900px) {
+    .full-panel { max-width: 100%; border-radius: 0; min-height: 100vh; }
+    .full-overlay { padding: 0; align-items: flex-start; }
+    .full-panel-body { padding: 1rem; }
+    .full-panel-head { padding: 0.9rem 1rem; }
+    .tables-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+    .sales-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+  .mobile-nav {
+    display: none;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--white);
+    border-top: 1.5px solid var(--parchment);
+    z-index: 100;
+    padding: 6px 0 env(safe-area-inset-bottom, 6px);
+  }
+  .mobile-nav-inner {
+    display: flex; justify-content: space-around; align-items: center;
+  }
+  .mnb {
+    flex: 1; background: none; border: none;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 2px; padding: 6px 4px; cursor: pointer;
+    color: var(--muted); font-family: 'Jost', sans-serif;
+    font-size: 0.62rem; font-weight: 500; letter-spacing: 0.04em;
+    transition: color 0.18s;
+  }
+  .mnb .mni { font-size: 1.35rem; line-height: 1; }
+  .mnb.active { color: var(--sage-dark); }
+  .mnb-badge {
+    position: absolute; top: 2px; right: calc(50% - 20px);
+    background: var(--sage); color: var(--white);
+    font-size: 0.55rem; font-weight: 700;
+    padding: 1px 5px; border-radius: 10px; min-width: 16px; text-align: center;
+  }
+  .mnb-wrap { position: relative; }
+
+  /* ── MOBILE SLIDE PANELS ── */
+  .mobile-sheet {
+    display: none;
+    position: fixed; inset: 0; z-index: 300;
+  }
+  .mobile-sheet-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(44,62,45,0.45);
+    backdrop-filter: blur(4px);
+  }
+  .mobile-sheet-panel {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: var(--white);
+    border-radius: 20px 20px 0 0;
+    max-height: 88vh;
+    display: flex; flex-direction: column;
+    box-shadow: 0 -8px 40px rgba(44,62,45,0.18);
+    transform: translateY(100%);
+    transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+  }
+  .mobile-sheet.open { display: flex; }
+  .mobile-sheet.open .mobile-sheet-panel { transform: translateY(0); }
+  .sheet-handle {
+    width: 40px; height: 4px; background: var(--parchment);
+    border-radius: 2px; margin: 10px auto 0;
+  }
+  .sheet-header {
+    padding: 0.8rem 1.3rem 0.7rem;
+    border-bottom: 1px solid var(--parchment);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .sheet-title { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; color: var(--ink); }
+  .sheet-close {
+    background: none; border: none; color: var(--muted);
+    font-size: 1.1rem; cursor: pointer; padding: 4px 8px;
+  }
+  .sheet-body { flex: 1; overflow-y: auto; padding: 0.8rem 1.3rem; }
+
+  /* Cat pills for mobile */
+  .mobile-cat-scroll {
+    display: none;
+    overflow-x: auto; gap: 8px; padding: 10px 1rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    background: var(--white);
+    border-bottom: 1px solid var(--parchment);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .mobile-cat-scroll::-webkit-scrollbar { display: none; }
+  .mcat-pill {
+    flex-shrink: 0; background: var(--cream);
+    border: 1.5px solid var(--parchment);
+    border-radius: 20px; padding: 6px 14px;
+    font-family: 'Jost', sans-serif; font-size: 0.78rem; font-weight: 500;
+    color: var(--muted); cursor: pointer; white-space: nowrap;
+    transition: all 0.18s;
+  }
+  .mcat-pill.active {
+    background: var(--sage); border-color: var(--sage);
+    color: var(--white); font-weight: 600;
+  }
+
+  /* ── RESPONSIVE BREAKPOINTS ── */
   @media (max-width: 900px) {
     .app {
       grid-template-columns: 1fr;
       height: auto;
+      padding-bottom: 70px;
     }
-    .sidebar, .order-panel {
-      display: none;
+    .sidebar { display: none; }
+    .order-panel { display: none; }
+    .menu-area { padding: 0; }
+    .menu-top { padding: 0.9rem 1rem 0; }
+    .items-grid {
+      padding: 0.7rem 1rem 1rem;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     }
-    .menu-area { padding: 1rem; }
-    .items-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
-    header { height: 56px; }
+    .mobile-nav { display: block; }
+    .mobile-cat-scroll { display: flex; }
+    header { height: 52px; padding: 0 1rem; }
+    .logo-text { font-size: 1.2rem; }
+    .nav-btn { display: none; }
+    .clk { font-size: 0.72rem; }
+  }
+
+  @media (max-width: 480px) {
+    .items-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+    .item-card { padding: 0.75rem; }
+    .item-emoji { font-size: 1.4rem; }
+    .item-name { font-size: 0.75rem; }
+    .item-price { font-size: 0.8rem; }
+  }
+
+  /* Mobile cart sheet adjustments */
+  @media (max-width: 900px) {
+    .mobile-sheet .cart-row { padding: 0.65rem 0; }
+    .mobile-sheet .cart-list { flex: 1; overflow-y: auto; }
+    .mobile-sheet .op-foot { padding: 0.9rem 1.3rem; border-top: 1px solid var(--parchment); }
   }
 </style>
 </head>
@@ -504,6 +713,8 @@
     <div class="collapse navbar-collapse justify-content-end" id="topNav">
       <div class="header-right d-flex align-items-center" style="gap:0.9rem;">
         <button class="nav-btn" onclick="openHistory()">📋 Order History</button>
+        <button class="nav-btn" onclick="openTables()">🪑 Tables</button>
+        <button class="nav-btn" onclick="openSales()">📊 Sales</button>
         <div class="clk">🕐 <span id="clk"></span></div>
         <div class="staff-pill">Staff</div>
       </div>
@@ -539,6 +750,16 @@
   </aside>
 
   <main class="menu-area">
+    <!-- Mobile category pills -->
+    <div class="mobile-cat-scroll" id="mobileCatScroll">
+      <button class="mcat-pill active" onclick="switchCatMobile(this,'breakfast')">🍳 Breakfast</button>
+      <button class="mcat-pill" onclick="switchCatMobile(this,'food')">🥟 Food</button>
+      <button class="mcat-pill" onclick="switchCatMobile(this,'snacks')">🍟 Snacks</button>
+      <button class="mcat-pill" onclick="switchCatMobile(this,'appetizer')">🥗 Appetizer</button>
+      <button class="mcat-pill" onclick="switchCatMobile(this,'hotdrinks')">☕ Hot Drinks</button>
+      <button class="mcat-pill" onclick="switchCatMobile(this,'colddrinks')">🧊 Cold Drinks</button>
+      <button class="mcat-pill" onclick="switchCatMobile(this,'alcoholic')">🍺 Alcoholic</button>
+    </div>
     <div class="menu-top">
       <div class="menu-heading" id="menuHeading">🍳 Breakfast</div>
       <input class="search-box" type="text" placeholder="Search menu…" oninput="doSearch(this.value)">
@@ -629,6 +850,100 @@
       <div></div>
     </div>
     <div class="hist-body" id="histBody"></div>
+  </div>
+</div>
+
+<!-- TABLES OVERLAY -->
+<div class="full-overlay" id="tablesOverlay">
+  <div class="full-panel">
+    <div class="full-panel-head">
+      <div class="full-panel-title">🪑 Table Management</div>
+      <button class="btn-close" onclick="closeTables()">✕ Close</button>
+    </div>
+    <div class="full-panel-body">
+      <div class="tables-grid" id="tablesGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SALES OVERLAY -->
+<div class="full-overlay" id="salesOverlay">
+  <div class="full-panel">
+    <div class="full-panel-head">
+      <div class="full-panel-title">📊 Sales Dashboard</div>
+      <button class="btn-close" onclick="closeSales()">✕ Close</button>
+    </div>
+    <div class="full-panel-body">
+      <div class="sales-stats" id="salesStats"></div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--ink);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--parchment);">📜 Order History</div>
+      <div style="overflow-x:auto;">
+        <table class="sales-table">
+          <thead>
+            <tr>
+              <th>Order ID</th><th>Time</th><th>Customer</th><th>Table</th><th>Items</th><th style="text-align:right">Total</th>
+            </tr>
+          </thead>
+          <tbody id="salesTableBody"></tbody>
+        </table>
+        <div id="salesEmpty" class="no-data" style="display:none">No orders placed yet today.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <button class="mnb active" id="mnbMenu" onclick="mobileTab('menu')">
+      <span class="mni">🍽️</span>Menu
+    </button>
+    <div class="mnb-wrap">
+      <button class="mnb" id="mnbCart" onclick="mobileTab('cart')">
+        <span class="mni">🛒</span>Cart
+      </button>
+      <span class="mnb-badge" id="mobileCartBadge" style="display:none">0</span>
+    </div>
+    <button class="mnb" id="mnbTables" onclick="openTables()">
+      <span class="mni">🪑</span>Tables
+    </button>
+    <button class="mnb" id="mnbSales" onclick="openSales()">
+      <span class="mni">📊</span>Sales
+    </button>
+    <button class="mnb" id="mnbHistory" onclick="openHistory()">
+      <span class="mni">📋</span>History
+    </button>
+  </div>
+</nav>
+
+<!-- MOBILE CART SHEET -->
+<div class="mobile-sheet" id="mobileCartSheet">
+  <div class="mobile-sheet-backdrop" onclick="closeMobileCart()"></div>
+  <div class="mobile-sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-title">🛒 Current Order</div>
+      <button class="sheet-close" onclick="closeMobileCart()">✕</button>
+    </div>
+    <div class="cust-row" style="padding:0.8rem 1.3rem;border-bottom:1px solid var(--parchment);display:grid;grid-template-columns:1fr 80px;gap:0.6rem;">
+      <div class="f">
+        <label>Customer Name</label>
+        <input type="text" id="custNameM" placeholder="e.g. Ram Bahadur" oninput="syncInputs('custName','custNameM')">
+      </div>
+      <div class="f">
+        <label>Table #</label>
+        <input type="number" id="tableNoM" placeholder="1" min="1" oninput="syncInputs('tableNo','tableNoM')">
+      </div>
+    </div>
+    <div class="sheet-body" id="mobileCartList">
+      <div class="empty-cart"><div class="big">🛒</div><div>Cart is empty</div></div>
+    </div>
+    <div class="op-foot">
+      <div class="totals">
+        <div class="tot-row grand"><span>Total</span><span class="v" id="mTTotal">Rs. 0</span></div>
+      </div>
+      <button class="btn-place" onclick="placeOrder()">✓  Place Order</button>
+      <button class="btn-clear" onclick="clearCart()">Clear Cart</button>
+    </div>
   </div>
 </div>
 
@@ -1004,6 +1319,195 @@ function openHistory(){
 }
 function toggleBlock(i){document.getElementById('ob'+i).classList.toggle('expanded');}
 function closeHistory(){document.getElementById('histOverlay').classList.remove('show');}
+
+// ── TABLE MANAGEMENT ──
+const TABLES_DEF = [
+  { id:1,  label:'Table 1',        seats:4,  type:'regular' },
+  { id:2,  label:'Table 2',        seats:4,  type:'regular' },
+  { id:3,  label:'Table 3',        seats:4,  type:'regular' },
+  { id:4,  label:'Table 4',        seats:4,  type:'regular' },
+  { id:5,  label:'Table 5',        seats:4,  type:'regular' },
+  { id:6,  label:'Table 6',        seats:4,  type:'regular' },
+  { id:7,  label:'Table 7',        seats:4,  type:'regular' },
+  { id:8,  label:'Table 8',        seats:4,  type:'regular' },
+  { id:9,  label:'Table 9',        seats:4,  type:'regular' },
+  { id:10, label:'The Long Table', seats:20, type:'large'   },
+];
+let tableOrders = {}; // { tableId: { order } }
+
+function openTables() {
+  renderTablesGrid();
+  document.getElementById('tablesOverlay').classList.add('show');
+}
+function closeTables() {
+  document.getElementById('tablesOverlay').classList.remove('show');
+}
+
+function renderTablesGrid() {
+  const grid = document.getElementById('tablesGrid');
+  grid.innerHTML = TABLES_DEF.map(t => {
+    const o = tableOrders[t.id];
+    const isLarge = t.type === 'large';
+    if (o) {
+      const itemList = o.items.map(c => `${c.emoji} ${c.name} ×${c.qty}`).join(', ');
+      return `<div class="table-card occupied${isLarge ? ' large-table' : ''}">
+        <div class="tc-head">
+          <div><div class="tc-name">${t.label}</div><div class="tc-seats">🪑 up to ${t.seats} seats</div></div>
+          <span class="tc-badge occ">Occupied</span>
+        </div>
+        <div class="tc-items">${itemList}</div>
+        <div class="tc-total">Total: Rs. ${o.total}</div>
+        <button class="tc-clear" onclick="clearTableOrder(${t.id})">✓ Mark as Cleared</button>
+      </div>`;
+    } else {
+      return `<div class="table-card${isLarge ? ' large-table' : ''}">
+        <div class="tc-head">
+          <div><div class="tc-name">${t.label}</div><div class="tc-seats">🪑 up to ${t.seats} seats</div></div>
+          <span class="tc-badge avail">Available</span>
+        </div>
+        <div class="tc-empty">🌿</div>
+      </div>`;
+    }
+  }).join('');
+}
+
+function clearTableOrder(id) {
+  delete tableOrders[id];
+  renderTablesGrid();
+}
+
+// ── SALES DASHBOARD ──
+function openSales() {
+  renderSalesDashboard();
+  document.getElementById('salesOverlay').classList.add('show');
+}
+function closeSales() {
+  document.getElementById('salesOverlay').classList.remove('show');
+}
+
+function renderSalesDashboard() {
+  const allOrders = [...history];
+  const totalRev = allOrders.reduce((s,o) => s+o.total, 0);
+  const avgOrder = allOrders.length ? Math.round(totalRev / allOrders.length) : 0;
+
+  // Count top item
+  const itemCounts = {};
+  allOrders.forEach(o => o.items.forEach(i => { itemCounts[i.name] = (itemCounts[i.name]||0)+i.qty; }));
+  const topEntry = Object.entries(itemCounts).sort((a,b)=>b[1]-a[1])[0];
+  const topItem = topEntry ? topEntry[0] : '—';
+
+  document.getElementById('salesStats').innerHTML = [
+    { icon:'💰', label:"Today's Revenue", value:'Rs. '+totalRev },
+    { icon:'📋', label:'Orders Placed',   value: allOrders.length },
+    { icon:'📈', label:'Average Order',   value:'Rs. '+avgOrder },
+    { icon:'⭐', label:'Top Item',        value: topItem },
+  ].map(s => `
+    <div class="stat-card">
+      <div class="stat-icon">${s.icon}</div>
+      <div class="stat-label">${s.label}</div>
+      <div class="stat-value">${s.value}</div>
+    </div>`).join('');
+
+  const tbody = document.getElementById('salesTableBody');
+  const empty = document.getElementById('salesEmpty');
+  if (!allOrders.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    tbody.innerHTML = allOrders.map(o => `
+      <tr>
+        <td style="font-weight:700;color:var(--sage-dark)">${o.id}</td>
+        <td style="color:var(--muted)">${o.time}</td>
+        <td>${o.name}</td>
+        <td style="color:var(--muted)">${o.table}</td>
+        <td style="color:var(--muted);font-size:0.73rem">${o.items.map(c=>`${c.emoji}${c.name}×${c.qty}`).join(', ')}</td>
+        <td style="text-align:right;font-weight:700;color:var(--sage-dark)">Rs. ${o.total}</td>
+      </tr>`).join('');
+  }
+}
+
+// Patch placeOrder to also store table occupancy
+const _origPlaceOrder = placeOrder;
+placeOrder = function() {
+  // We intercept AFTER the original succeeds via a flag
+  const tableVal = document.getElementById('tableNo').value || document.getElementById('tableNoM').value || '—';
+  const cartSnap = [...cart];
+  const totalSnap = cart.reduce((s,c)=>s+c.price*c.qty,0);
+  if (tableVal && tableVal !== '—' && cartSnap.length) {
+    tableOrders[tableVal] = { items: cartSnap, total: totalSnap, time: new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) };
+  }
+  _origPlaceOrder();
+};
+function switchCatMobile(btn, cat) {
+  document.querySelectorAll('.mcat-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Also sync desktop sidebar
+  document.querySelectorAll('.cat-btn').forEach(b => {
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'"+cat+"'")) b.classList.add('active');
+    else b.classList.remove('active');
+  });
+  currentCat = cat;
+  document.getElementById('menuHeading').textContent = MENU[cat].label;
+  document.querySelector('.search-box').value = '';
+  renderGrid(MENU[cat].items);
+}
+
+function mobileTab(tab) {
+  document.querySelectorAll('.mnb').forEach(b => b.classList.remove('active'));
+  if (tab === 'menu') {
+    document.getElementById('mnbMenu').classList.add('active');
+    closeMobileCart();
+  } else if (tab === 'cart') {
+    document.getElementById('mnbCart').classList.add('active');
+    openMobileCart();
+  }
+}
+
+function openMobileCart() {
+  syncMobileCart();
+  document.getElementById('mobileCartSheet').classList.add('open');
+}
+function closeMobileCart() {
+  document.getElementById('mobileCartSheet').classList.remove('open');
+  document.getElementById('mnbMenu').classList.add('active');
+  document.getElementById('mnbCart').classList.remove('active');
+}
+
+function syncInputs(master, mirror) {
+  document.getElementById(master).value = document.getElementById(mirror).value;
+}
+
+function syncMobileCart() {
+  const sub = cart.reduce((s,c) => s+c.price*c.qty, 0);
+  const count = cart.reduce((s,c) => s+c.qty, 0);
+  const badge = document.getElementById('mobileCartBadge');
+  badge.textContent = count;
+  badge.style.display = count > 0 ? 'block' : 'none';
+  document.getElementById('mTTotal').textContent = 'Rs. ' + sub;
+  if (!cart.length) {
+    document.getElementById('mobileCartList').innerHTML = `<div class="empty-cart"><div class="big">🛒</div><div>Cart is empty</div><div style="font-size:0.7rem;margin-top:2px">Tap any item to add</div></div>`;
+    return;
+  }
+  document.getElementById('mobileCartList').innerHTML = cart.map(c => `
+    <div class="cart-row">
+      <div class="cr-info">
+        <div class="cr-name">${c.emoji} ${c.name}</div>
+        <div class="cr-unit">Rs. ${c.price} × ${c.qty}</div>
+      </div>
+      <div class="qty-box">
+        <button class="qb" onclick="changeQty(${c.id},-1)">−</button>
+        <div class="qn">${c.qty}</div>
+        <button class="qb" onclick="changeQty(${c.id},1)">+</button>
+      </div>
+      <div class="cr-price">Rs. ${c.price*c.qty}</div>
+      <button class="cr-del" onclick="removeItem(${c.id})">✕</button>
+    </div>`).join('');
+}
+
+// Patch renderCart to also sync mobile
+const _origRenderCart = renderCart;
+renderCart = function() { _origRenderCart(); syncMobileCart(); };
 
 renderGrid(MENU.breakfast.items);
 </script>
