@@ -1161,11 +1161,10 @@ function updateTotals(sub){
 
 function placeOrder(){
   if(!cart.length){alert('Please add items first!');return;}
-  const name=document.getElementById('custName').value.trim()||'Guest';
-  const table=document.getElementById('tableNo').value||'—';
+  const name=document.getElementById('custName').value.trim()||document.getElementById('custNameM').value.trim()||'Guest';
+  const table=document.getElementById('tableNo').value||document.getElementById('tableNoM').value||'—';
   const total=cart.reduce((s,c)=>s+c.price*c.qty,0);
   
-  // Send to API
   const orderData = {
     customer_name: name,
     table_no: table,
@@ -1183,41 +1182,51 @@ function placeOrder(){
     const oid = data.id ? '#' + String(data.id).padStart(4, '0') : '#' + String(++orderNum).padStart(4, '0');
     const now = new Date();
     const timeStr = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    
-    // Store locally for display
-    history.unshift({id:oid, name, table, total, time:timeStr, items:[...cart]});
-    
-    document.getElementById('rId').textContent = oid;
-    document.getElementById('rTime').innerHTML = now.toLocaleDateString('en-NP')+'<br>'+timeStr;
-    document.getElementById('rName').textContent = name;
-    document.getElementById('rTable').textContent = table;
-    document.getElementById('rItems').innerHTML = cart.map(c=>`<div class="r-row"><span class="rn">${c.emoji} ${c.name}</span><span class="rq">×${c.qty}</span><span class="rp">Rs.${c.price*c.qty}</span></div>`).join('');
-    document.getElementById('rTotal').textContent = 'Rs. ' + total;
-    document.getElementById('confirmOverlay').classList.add('show');
+    // Add to local history too
+    history.unshift({id:oid, customer_name:name, table_no:table, total, created_at:now.toISOString(), items:[...cart]});
+    // Auto update history stats if panel is open
+    updateHistoryStats();
+    showConfirmModal(oid, now, timeStr, name, table, total);
   })
   .catch(err => {
     console.error('Error placing order:', err);
-    alert('Error placing order. Creating local copy...');
-    // Fallback to local storage
     const oid = '#' + String(++orderNum).padStart(4, '0');
     const now = new Date();
     const timeStr = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    history.unshift({id:oid, name, table, total, time:timeStr, items:[...cart]});
-    
-    document.getElementById('rId').textContent = oid;
-    document.getElementById('rTime').innerHTML = now.toLocaleDateString('en-NP')+'<br>'+timeStr;
-    document.getElementById('rName').textContent = name;
-    document.getElementById('rTable').textContent = table;
-    document.getElementById('rItems').innerHTML = cart.map(c=>`<div class="r-row"><span class="rn">${c.emoji} ${c.name}</span><span class="rq">×${c.qty}</span><span class="rp">Rs.${c.price*c.qty}</span></div>`).join('');
-    document.getElementById('rTotal').textContent = 'Rs. ' + total;
-    document.getElementById('confirmOverlay').classList.add('show');
+    history.unshift({id:oid, customer_name:name, table_no:table, total, created_at:now.toISOString(), items:[...cart]});
+    updateHistoryStats();
+    showConfirmModal(oid, now, timeStr, name, table, total);
   });
 }
+
+function showConfirmModal(oid, now, timeStr, name, table, total) {
+  document.getElementById('rId').textContent = oid;
+  document.getElementById('rTime').innerHTML = now.toLocaleDateString('en-NP')+'<br>'+timeStr;
+  document.getElementById('rName').textContent = name;
+  document.getElementById('rTable').textContent = table;
+  document.getElementById('rItems').innerHTML = cart.map(c=>`<div class="r-row"><span class="rn">${c.emoji} ${c.name}</span><span class="rq">×${c.qty}</span><span class="rp">Rs.${c.price*c.qty}</span></div>`).join('');
+  document.getElementById('rTotal').textContent = 'Rs. ' + total;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+
+function updateHistoryStats() {
+  const rev = history.reduce((s,o)=>s+(o.total||0), 0);
+  document.getElementById('hOrders').textContent = history.length;
+  document.getElementById('hRevenue').textContent = 'Rs. ' + rev;
+  // If history panel is open, re-render it live
+  if (document.getElementById('histOverlay').classList.contains('show')) {
+    const body = document.getElementById('histBody');
+    renderOrderList(history, body);
+  }
+}
+
 function newOrder(){
   document.getElementById('confirmOverlay').classList.remove('show');
   clearCart();
   document.getElementById('custName').value='';
   document.getElementById('tableNo').value='';
+  document.getElementById('custNameM').value='';
+  document.getElementById('tableNoM').value='';
 }
 
 function renderOrderList(allOrders, body) {
@@ -1303,11 +1312,10 @@ function confirmClearHistory() {
   fetch(`${API_BASE}/api/orders`, { method: 'DELETE' })
     .then(res => res.json())
     .then(() => {
-      history = [];
+      history.length = 0; // Clear local array
       document.getElementById('hOrders').textContent = '0';
       document.getElementById('hRevenue').textContent = 'Rs. 0';
       document.getElementById('histBody').innerHTML = '<div class="no-orders">No orders placed yet today.</div>';
-      alert('✅ Order history cleared!');
     })
     .catch(err => {
       console.error('Clear error:', err);
