@@ -297,7 +297,7 @@
     position:fixed; inset:0;
     background:rgba(44,62,45,0.5);
     display:flex; align-items:center; justify-content:center;
-    z-index:200; backdrop-filter:blur(6px);
+    z-index:200;
     opacity:0; pointer-events:none; transition:opacity 0.3s;
   }
   .overlay.show { opacity:1; pointer-events:all; }
@@ -529,7 +529,7 @@
   /* ── TABLES & SALES OVERLAYS ── */
   .full-overlay {
     position: fixed; inset: 0; z-index: 200;
-    background: rgba(44,62,45,0.45); backdrop-filter: blur(6px);
+    background: rgba(44,62,45,0.45);
     display: flex; align-items: flex-start; justify-content: center;
     padding: 20px; overflow-y: auto;
     opacity: 0; pointer-events: none; transition: opacity 0.3s;
@@ -729,7 +729,6 @@
   .mobile-sheet-backdrop {
     position: absolute; inset: 0;
     background: rgba(44,62,45,0.45);
-    backdrop-filter: blur(4px);
   }
   .mobile-sheet-panel {
     position: absolute; bottom: 0; left: 0; right: 0;
@@ -927,28 +926,18 @@
 </div>
 
 <!-- CONFIRM -->
-<div class="overlay" id="confirmOverlay">
-  <div class="modal">
-    <span class="modal-icon">✅</span>
-    <div class="modal-title">Order Placed!</div>
-    <div class="modal-sub">Successfully sent to the kitchen.</div>
-    <div class="receipt">
-      <div class="receipt-top">
-        <div>
-          <div class="r-oid-label">Order ID</div>
-          <div class="r-oid" id="rId">#0101</div>
-        </div>
-        <div class="r-time" id="rTime"></div>
-      </div>
-      <div id="rItems"></div>
-      <div class="r-total">
-        <span>Total Paid</span>
-        <span class="amt" id="rTotal"></span>
-      </div>
-    </div>
-    <div class="modal-info">Customer: <span id="rName">—</span> &nbsp;·&nbsp; Table: <span id="rTable">—</span></div>
-    <button class="btn-new" onclick="newOrder()">+ New Order</button>
-  </div>
+<div id="orderToast" style="
+  position:fixed; top:80px; left:50%; transform:translateX(-50%) translateY(-20px);
+  background:var(--sage-dark); color:white;
+  padding:12px 24px; border-radius:50px;
+  font-family:'Jost',sans-serif; font-size:0.88rem; font-weight:600;
+  box-shadow:0 8px 28px rgba(44,62,45,0.28);
+  z-index:9999; opacity:0; pointer-events:none;
+  transition:all 0.3s ease; white-space:nowrap;
+  display:flex; align-items:center; gap:10px;
+">
+  <span>✅</span>
+  <span id="orderToastMsg">Order placed!</span>
 </div>
 
 <!-- HISTORY -->
@@ -1364,44 +1353,46 @@ function placeOrder(){
     const timeStr = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
     history.unshift({id:oid, customer_name:name, table_no:table, total, created_at:now.toISOString(), items:[...cart]});
     updateHistoryStats();
-    showConfirmModal(oid, now, timeStr, name, table, total);
-    resetSession(); // ← auto reset immediately
+    resetSession();
+    showOrderToast(oid, name, table, total);
   })
   .catch(err => {
     console.error('Error placing order:', err);
     const oid = '#' + String(++orderNum).padStart(4, '0');
     const now = new Date();
-    const timeStr = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
     history.unshift({id:oid, customer_name:name, table_no:table, total, created_at:now.toISOString(), items:[...cart]});
     updateHistoryStats();
-    showConfirmModal(oid, now, timeStr, name, table, total);
-    resetSession(); // ← auto reset even on error
+    resetSession();
+    showOrderToast(oid, name, table, total);
   });
-}
-
-function showConfirmModal(oid, now, timeStr, name, table, total) {
-  document.getElementById('rId').textContent = oid;
-  document.getElementById('rTime').innerHTML = now.toLocaleDateString('en-NP')+'<br>'+timeStr;
-  document.getElementById('rName').textContent = name;
-  document.getElementById('rTable').textContent = table;
-  document.getElementById('rItems').innerHTML = cart.map(c=>`<div class="r-row"><span class="rn">${c.emoji} ${c.name}</span><span class="rq">×${c.qty}</span><span class="rp">Rs.${c.price*c.qty}</span></div>`).join('');
-  document.getElementById('rTotal').textContent = 'Rs. ' + total;
-  document.getElementById('confirmOverlay').classList.add('show');
 }
 
 function updateHistoryStats() {
   const rev = history.reduce((s,o)=>s+(o.total||0), 0);
   document.getElementById('hOrders').textContent = history.length;
   document.getElementById('hRevenue').textContent = 'Rs. ' + rev;
-  // If history panel is open, re-render it live
   if (document.getElementById('histOverlay').classList.contains('show')) {
-    const body = document.getElementById('histBody');
-    renderOrderList(history, body);
+    renderOrderList(history, document.getElementById('histBody'));
   }
 }
 
+function showOrderToast(oid, name, table, total) {
+  const toast = document.getElementById('orderToast');
+  document.getElementById('orderToastMsg').textContent = `Order ${oid} placed! Table ${table} · Rs. ${total}`;
+  toast.style.opacity = '1';
+  toast.style.transform = 'translateX(-50%) translateY(0)';
+  // Auto hide after 3 seconds
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(-20px)';
+  }, 3000);
+  // On mobile — close cart and go back to menu
+  closeMobileCart();
+  mobileTab('menu');
+}
+
 function newOrder(){
-  document.getElementById('confirmOverlay').classList.remove('show');
+  // kept for compatibility, does nothing now
 }
 
 function renderOrderList(allOrders, body) {
