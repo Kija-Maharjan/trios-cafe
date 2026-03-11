@@ -830,8 +830,9 @@
     <a class="navbar-brand d-flex align-items-center" href="#" style="gap:12px;padding:0;margin-right:0;">
       <div class="logo-mark">☕</div>
       <div class="logo-text">
-        Trio's Cafe Made by Kija Maharjan
+        Trio's Cafe
         <small>Point of Sale · Kathmandu</small>
+        <small style="display:block;opacity:0.55;font-size:0.55rem;margin-top:1px;">Made by Kija Maharjan</small>
       </div>
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNav" aria-controls="topNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -874,6 +875,9 @@
     <button class="cat-btn" onclick="switchCat(this,'alcoholic')">
       <span class="icon">🍺</span> Alcoholic <span class="cnt">12</span>
     </button>
+    <button class="cat-btn" onclick="switchCat(this,'cigarettes')">
+      <span class="icon">🚬</span> Cigarettes <span class="cnt">6</span>
+    </button>
   </aside>
 
   <main class="menu-area">
@@ -886,6 +890,7 @@
       <button class="mcat-pill" onclick="switchCatMobile(this,'hotdrinks')">☕ Hot Drinks</button>
       <button class="mcat-pill" onclick="switchCatMobile(this,'colddrinks')">🧊 Cold Drinks</button>
       <button class="mcat-pill" onclick="switchCatMobile(this,'alcoholic')">🍺 Alcoholic</button>
+      <button class="mcat-pill" onclick="switchCatMobile(this,'cigarettes')">🚬 Cigarettes</button>
     </div>
     <div class="menu-top">
       <div class="menu-heading" id="menuHeading">🍳 Breakfast</div>
@@ -1243,7 +1248,7 @@ const MENU = {
     {id:140,name:'Gorkha Strong (S)',    price:230, emoji:'🍺',note:'beer'},
     {id:141,name:'Manang Wine',          price:1400,emoji:'🍷',note:'wine'},
   ]},
-  'Cigarettes': { items: [
+  cigarettes:{label:'🚬 Cigarettes',items:[
     {id:142,name:'Surya Red',    price:25, emoji:'🚬',note:'cigarette'},
     {id:143,name:'Surya Light',  price:25, emoji:'🚬',note:'cigarette'},
     {id:144,name:'Surya Arctic', price:30, emoji:'🚬',note:'cigarette'},
@@ -1726,7 +1731,7 @@ const CAT_MAP = {
   'Hot Drinks':'☕ Hot Drinks',
   'Cold Drinks':'🧊 Cold Drinks',
   'Alcoholic':   '🍺 Alcoholic',
-  'Cigarettes':  '🚬 Cigarettes',
+  'cigarettes':  '🚬 Cigarettes',
 };
 
 function openSales() {
