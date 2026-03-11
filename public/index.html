@@ -228,6 +228,8 @@
     width:100%; outline:none; transition:border-color 0.2s;
   }
   .f input:focus { border-color:var(--sage); }
+  .f input.required-err { border-color:var(--red) !important; background:#fff5f5; }
+  .f input.required-err::placeholder { color:#e07060; }
 
   .cart-list { flex:1; overflow-y:auto; padding:0.8rem 1.3rem; }
 
@@ -828,7 +830,7 @@
     <a class="navbar-brand d-flex align-items-center" href="#" style="gap:12px;padding:0;margin-right:0;">
       <div class="logo-mark">☕</div>
       <div class="logo-text">
-        Trio's Cafe made by Kija Maharjan
+        Trio's Cafe Made By Kija Maharjan
         <small>Point of Sale · Kathmandu</small>
       </div>
     </a>
@@ -901,11 +903,11 @@
     <div class="cust-row">
       <div class="f">
         <label>Customer Name</label>
-        <input type="text" id="custName" name="custName" placeholder="e.g. Ram Bahadur" aria-label="Customer name">
+        <input type="text" id="custName" name="custName" placeholder="e.g. Ram Bahadur" aria-label="Customer name" oninput="this.classList.remove('required-err');document.getElementById('custNameM').classList.remove('required-err')">
       </div>
       <div class="f">
         <label>Table #</label>
-        <input type="number" id="tableNo" name="tableNo" placeholder="1" min="1" aria-label="Table number">
+        <input type="number" id="tableNo" name="tableNo" placeholder="1" min="1" aria-label="Table number" oninput="this.classList.remove('required-err');document.getElementById('tableNoM').classList.remove('required-err')">
       </div>
     </div>
     <div class="cart-list" id="cartList">
@@ -1352,8 +1354,24 @@ function resetSession() {
 
 function placeOrder(){
   if(!cart.length){alert('Please add items first!');return;}
-  const name=document.getElementById('custName').value.trim()||document.getElementById('custNameM').value.trim()||'Guest';
-  const table=document.getElementById('tableNo').value||document.getElementById('tableNoM').value||'—';
+  const name=document.getElementById('custName').value.trim()||document.getElementById('custNameM').value.trim()||'';
+  const table=document.getElementById('tableNo').value.trim()||document.getElementById('tableNoM').value.trim()||'';
+
+  // Clear previous errors
+  ['custName','custNameM','tableNo','tableNoM'].forEach(id=>document.getElementById(id).classList.remove('required-err'));
+
+  let hasErr = false;
+  if(!name){
+    document.getElementById('custName').classList.add('required-err');
+    document.getElementById('custNameM').classList.add('required-err');
+    hasErr = true;
+  }
+  if(!table){
+    document.getElementById('tableNo').classList.add('required-err');
+    document.getElementById('tableNoM').classList.add('required-err');
+    hasErr = true;
+  }
+  if(hasErr) return;
   const total=cart.reduce((s,c)=>s+c.price*c.qty,0);
   
   const orderData = {
@@ -1980,6 +1998,9 @@ function closeMobileCart() {
 
 function syncInputs(master, mirror) {
   document.getElementById(master).value = document.getElementById(mirror).value;
+  // Clear error highlight when user types
+  document.getElementById(master).classList.remove('required-err');
+  document.getElementById(mirror).classList.remove('required-err');
 }
 
 function syncMobileCart() {
